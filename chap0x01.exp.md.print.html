@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="黄玮">
+  <title>Linux系统与网络管理</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header>
+<h1 class="title">Linux系统与网络管理</h1>
+<h2 class="author">黄玮</h2>
+</header>
+<h1 id="第一章linux基础实验">第一章：Linux基础（实验）</h1>
+<hr />
+<h2 id="gnu-is-not-unix">GNU is NOT Unix</h2>
+<h1 id="软件环境">软件环境</h1>
+<hr />
+<ul>
+<li>Virtualbox</li>
+<li>Ubuntu 18.04 Server 64bit
+<ul>
+<li>备选：Ubuntu 16.04 Server 64bit</li>
+<li>备选：Ubuntu 16.04 Desktop 64bit</li>
+</ul></li>
+</ul>
+<h1 id="实验问题">实验问题</h1>
+<hr />
+<ul>
+<li>如何配置无人值守安装iso并在Virtualbox中完成自动化安装。</li>
+<li>Virtualbox安装完Ubuntu之后新添加的网卡如何实现系统开机自动启用和自动获取IP？</li>
+<li>如何使用sftp在虚拟机和宿主机之间传输文件？</li>
+</ul>
+<h1 id="实验报告要求">实验报告要求</h1>
+<hr />
+<ul>
+<li>使用 <code>markdown</code> 格式纯文本</li>
+<li>使用 <a href="https://classroom.github.com/classrooms">Github Classroom</a> 管理作业（课堂当日宣讲为准）</li>
+<li>每次作业应 <code>commit</code> 到独立分支并通过 <code>Pull Request</code> 分别提交每一次作业</li>
+<li>实验报告应图文并茂的记录实验过程，证明自己独立完成的实验作业</li>
+<li>记录自己独立解决的问题和解决办法，并给出问题解决用到的参考资料出处、链接</li>
+</ul>
+<h1 id="参考文献">参考文献</h1>
+<hr />
+<ul>
+<li><a href="http://askubuntu.com/questions/704035/no-eth0-listed-in-ifconfig-a-only-enp0s3-and-lo">No “eth0” listed in ifconfig -a, only enp0s3 and lo</a></li>
+</ul>
+<h1 id="无人值守安装iso制作过程示例">无人值守安装iso制作过程示例</h1>
+<hr />
+<h2 id="实现特性">实现特性</h2>
+<ul>
+<li>定制一个普通用户名和默认密码</li>
+<li>定制安装OpenSSH Server</li>
+<li>安装过程禁止自动联网更新软件包</li>
+</ul>
+<hr />
+<h2 id="实验提醒">实验提醒</h2>
+<ul>
+<li>先「有人值守」方式安装好 <strong>一个可用的 Ubuntu 系统环境</strong></li>
+<li>以下操作指令均在上述环境的 <strong>命令行</strong> 中输入完成</li>
+<li>根据需要 <strong>酌情</strong> 修改指令</li>
+<li>遇到指令执行出错务必 <strong>仔细</strong> 阅读出错信息并在搜索引擎中搜索 <strong>错误关键字</strong></li>
+</ul>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 根据实际情况，自行替换其中的参数</span>
+<span class="co"># 在当前用户目录下创建一个用于挂载iso镜像文件的目录</span>
+<span class="kw">mkdir</span> loopdir
+
+<span class="co"># 挂载iso镜像文件到该目录</span>
+<span class="kw">mount</span> -o loop ubuntu-16.04.1-server-amd64.iso loopdir
+
+<span class="co"># 创建一个工作目录用于克隆光盘内容</span>
+<span class="kw">mkdir</span> cd
+ 
+<span class="co"># 同步光盘内容到目标工作目录</span>
+<span class="co"># 一定要注意loopdir后的这个/，cd后面不能有/</span>
+<span class="kw">rsync</span> -av loopdir/ cd
+
+<span class="co"># 卸载iso镜像</span>
+<span class="kw">umount</span> loopdir
+
+<span class="co"># 进入目标工作目录</span>
+<span class="kw">cd</span> cd/
+
+<span class="co"># 编辑Ubuntu安装引导界面增加一个新菜单项入口</span>
+<span class="kw">vim</span> isolinux/txt.cfg</code></pre></div>
+<hr />
+<p>添加以下内容到该文件后强制保存退出</p>
+<pre><code>label autoinstall
+  menu label ^Auto Install Ubuntu Server
+  kernel /install/vmlinuz
+  append  file=/cdrom/preseed/ubuntu-server-autoinstall.seed debian-installer/locale=en_US console-setup/layoutcode=us keyboard-configuration/layoutcode=us console-setup/ask_detect=false localechooser/translation/warn-light=true localechooser/translation/warn-severe=true initrd=/install/initrd.gz root=/dev/ram rw quiet</code></pre>
+<hr />
+<ul>
+<li>提前阅读并编辑定制Ubuntu官方提供的示例<a href="https://help.ubuntu.com/lts/installation-guide/example-preseed.txt">preseed.cfg</a>，并将该文件保存到刚才创建的工作目录<code>~/cd/preseed/ubuntu-server-autoinstall.seed</code></li>
+<li>修改isolinux/isolinux.cfg，增加内容<code>timeout 10</code>（可选，否则需要手动按下ENTER启动安装界面）</li>
+</ul>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 重新生成md5sum.txt</span>
+<span class="kw">cd</span> ~/cd <span class="kw">&amp;&amp;</span> <span class="kw">find</span> . -type f -print0 <span class="kw">|</span> <span class="kw">xargs</span> -0 md5sum <span class="kw">&gt;</span> md5sum.txt
+
+<span class="co"># 封闭改动后的目录到.iso</span>
+<span class="ot">IMAGE=</span>custom.iso
+<span class="ot">BUILD=</span>~/cd/
+
+<span class="kw">mkisofs</span> -r -V <span class="st">&quot;Custom Ubuntu Install CD&quot;</span> \
+            -cache-inodes \
+            -J -l -b isolinux/isolinux.bin \
+            -c isolinux/boot.cat -no-emul-boot \
+            -boot-load-size 4 -boot-info-table \
+            -o <span class="ot">$IMAGE</span> <span class="ot">$BUILD</span>
+
+<span class="co"># 如果目标磁盘之前有数据，则在安装过程中会在分区检测环节出现人机交互对话框需要人工选择</span></code></pre></div>
+<hr />
+<p>一个我修改定制好的<a href="exp/chap0x01/cd-rom/preseed/ubuntu-server-autoinstall.seed">ubuntu-server-autoinstall.seed</a>，请自行和官方示例文件进行比对，自行思考理解和掌握：</p>
+<ul>
+<li>我做了哪些修改？
+<ul>
+<li>用什么「工具」能提高「差异」比对的效率？</li>
+</ul></li>
+<li>这些修改的作用是什么？</li>
+</ul>
+<hr />
+<h2 id="友情提醒">友情提醒</h2>
+<ul>
+<li>preseed 的方法一定要用 ubuntu-18.04.1-server-amd64.iso 不能用 <a href="https://askubuntu.com/questions/1063393/error-creating-custom-install-of-ubuntu-18-04-live-server">ubuntu-18.04.1-live-server-amd64.iso</a></li>
+<li>txt.cfg 中我们添加的自动安装菜单选项一定要「置顶」，不能通过修改文件首行 default 参数的取值来实现自动选中菜单开始安装系统的目的</li>
+</ul>
+</body>
+</html>

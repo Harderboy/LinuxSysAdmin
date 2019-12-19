@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="黄玮">
+  <title>Linux系统与网络管理</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header>
+<h1 class="title">Linux系统与网络管理</h1>
+<h2 class="author">黄玮</h2>
+</header>
+<h1 id="第四章shell脚本编程基础">第四章：shell脚本编程基础</h1>
+<hr />
+<h2 id="dont-repeat-yourself"><font color='red'>D</font>on't <font color='red'>r</font>epeat <font color='red'>y</font>ourself</h2>
+<h1 id="hello-world">Hello World</h1>
+<hr />
+<p><a href="https://repl.it/@c4pr1c3/LinuxSysAdmin"><img src="images/chap0x04/bash-online.png" alt="在线 Bash 解释器和编辑器环境" /></a></p>
+<blockquote>
+<p>扫码或点击图片「零安装、零配置」直接在浏览器里体验 Bash 编程</p>
+</blockquote>
+<hr />
+<h2 id="备用在线-bash-解释器和编辑器环境">备用在线 Bash 解释器和编辑器环境</h2>
+<ul>
+<li><a href="https://www.tutorialspoint.com/execute_bash_online.php">CodingGround@tutorialspoint.com</a></li>
+<li><a href="https://paiza.io/en/projects/new?language=bash">paiza.io</a></li>
+</ul>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/usr/bin/env bash</span>
+
+<span class="kw">echo</span> <span class="st">&quot;hello world!&quot;</span></code></pre></div>
+<hr />
+<h2 id="详解">详解</h2>
+<ul>
+<li>注释符号 <strong>#</strong></li>
+<li><a href="https://asciinema.org/a/z1xLUVCLitp02XLIICSfdnPSC">文件起始处的 <code>#!</code> 声明自己是一个<strong>脚本</strong>文件</a></li>
+<li>当前shell脚本默认使用的<strong>解释器</strong></li>
+<li>查看当前正在使用shell解释器</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">ps</span> <span class="kw">|</span> <span class="kw">grep</span> <span class="ot">$$</span></code></pre></div>
+<hr />
+<ul>
+<li>查看当前shell解释器对应的文件绝对路径</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">type</span> bash</code></pre></div>
+<ul>
+<li>查看当前bash的版本号</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">bash</span> --version</code></pre></div>
+<hr />
+<h2 id="为什么使用-usrbinenv-bash"><a href="https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash">为什么使用 <code>#!/usr/bin/env bash</code></a></h2>
+<p>当我们通过 <code>./target.sh</code> 执行脚本时：</p>
+<ul>
+<li>避免目标系统上的解释器路径和预期不一致
+<ul>
+<li>例如同时存在多个版本的 Bash，通过环境变量设置的优先解释器路径不同于期望的 <code>/bin/bash</code></li>
+</ul></li>
+</ul>
+<hr />
+<p>类似的我们可以在 Python 脚本文件行首书写</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/usr/bin/env python</span></code></pre></div>
+<hr />
+<blockquote>
+<p>例外：如果就是希望指定路径的脚本解释器执行当前脚本，而非环境变量中设置的优先脚本解释器</p>
+</blockquote>
+<hr />
+<p>如果我们通过 <code>bash target.sh</code> 或 <code>/bin/bash target.sh</code> 执行脚本则上述设置相当于原本的注释行作用</p>
+<h1 id="shell-内置帮助">Shell 内置帮助</h1>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">help</span> type
+
+<span class="kw">help</span> help</code></pre></div>
+<h1 id="变量">变量</h1>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">PRICE_PER_APPLE=</span>5
+<span class="ot">MyFirstLetters=</span>ABC
+<span class="ot">greeting=</span><span class="st">&#39;Hello        world!&#39;</span></code></pre></div>
+<ul>
+<li>变量名区分大小写</li>
+<li><strong>=</strong>左右两边不能有空格</li>
+<li>单引号包围的字符串中不对特殊符号做解释执行</li>
+<li>双引号包围的字符串中对特殊符号解释执行</li>
+<li>使用 <strong>\</strong> 转义特殊符号避免被解释执行</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">PRICE_PER_APPLE=</span>5
+<span class="kw">echo</span> <span class="st">&quot;The price of an Apple today is: </span><span class="dt">\$</span><span class="st">HK </span><span class="ot">$PRICE_PER_APPLE</span><span class="st">&quot;</span></code></pre></div>
+<hr />
+<ul>
+<li>使用 <strong>${}</strong> 包围变量名避免变量名被解释执行时的二义性</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">MyFirstLetters=</span>ABC
+<span class="kw">echo</span> <span class="st">&quot;The first 10 letters in the alphabet are: </span><span class="ot">${MyFirstLetters}</span><span class="st">DEFGHIJ&quot;</span></code></pre></div>
+<ul>
+<li>使用双引号 <strong>&quot;&quot;</strong> 包围变量名可以保留所有空格字符</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">greeting=</span><span class="st">&#39;Hello        world!&#39;</span>
+
+<span class="co"># 此处实际上实现了一个字符串 拼接/连接 操作</span>
+<span class="kw">echo</span> <span class="ot">$greeting</span><span class="st">&quot; now with spaces: </span><span class="ot">$greeting</span><span class="st">&quot;</span></code></pre></div>
+<hr />
+<ul>
+<li>其他程序的输出结果直接赋值给shell变量</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">FILELIST=</span><span class="kw">`ls`</span>
+<span class="ot">FileWithTimeStamp=</span>/tmp/file_<span class="ot">$(</span><span class="kw">/bin/date</span> +%Y-%m-%d<span class="ot">)</span>.txt</code></pre></div>
+<p>上述代码中的 <strong>``</strong> 符号和 <strong>$()</strong> 都可以用于命令输出结果替换变量赋值结果。</p>
+<hr />
+<p>课堂练习</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/usr/bin/env bash</span>
+<span class="co"># 代码填空，使用最终输出3个包含correct的语句</span>
+<span class="ot">BIRTHDATE=</span>   <span class="co"># 填入一个字符串</span>
+<span class="ot">Presents=</span>    <span class="co"># 填入一个整数</span>
+<span class="ot">BIRTHDAY=</span>    <span class="co"># 使用命令替换方法赋值</span>
+
+
+<span class="co"># 测试代码 - 勿修改</span>
+
+<span class="kw">if [</span> <span class="st">&quot;</span><span class="ot">$BIRTHDATE</span><span class="st">&quot;</span> <span class="ot">==</span> <span class="st">&quot;Jan 1 2000&quot;</span><span class="kw"> ]</span> ; <span class="kw">then</span>
+    <span class="kw">echo</span> <span class="st">&quot;BIRTHDATE is correct, it is </span><span class="ot">$BIRTHDATE</span><span class="st">&quot;</span>
+<span class="kw">else</span>
+    <span class="kw">echo</span> <span class="st">&quot;BIRTHDATE is incorrect - please retry&quot;</span>
+<span class="kw">fi</span>
+<span class="kw">if [</span> <span class="ot">$Presents</span> <span class="ot">==</span> 10<span class="kw"> ]</span> ; <span class="kw">then</span>
+    <span class="kw">echo</span> <span class="st">&quot;correct! I have received </span><span class="ot">$Presents</span><span class="st"> presents&quot;</span>
+<span class="kw">else</span>
+    <span class="kw">echo</span> <span class="st">&quot;Presents is incorrect - please retry&quot;</span>
+<span class="kw">fi</span>
+<span class="kw">if [</span> <span class="st">&quot;</span><span class="ot">$BIRTHDAY</span><span class="st">&quot;</span> <span class="ot">==</span> <span class="st">&quot;Saturday&quot;</span><span class="kw"> ]</span> ; <span class="kw">then</span>
+    <span class="kw">echo</span> <span class="st">&quot;correct! I was born on a </span><span class="ot">$BIRTHDAY</span><span class="st">&quot;</span>
+<span class="kw">else</span>
+    <span class="kw">echo</span> <span class="st">&quot;BIRTHDAY is incorrect - please retry&quot;</span>
+<span class="kw">fi</span></code></pre></div>
+<hr />
+<blockquote>
+<p>提示：可以使用以下方法将形如&quot;Jan 1 2000&quot;的日期时间字符串$date1转换出星期几</p>
+</blockquote>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">date</span> -d <span class="st">&quot;</span><span class="ot">$date1</span><span class="st">&quot;</span> +%A</code></pre></div>
+<h1 id="脚本调试的方法"><a href="http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_02_03.html">脚本调试的方法</a></h1>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 调试模式运行，逐行执行“命令”并打印“命令”接受的输入参数值</span>
+$ <span class="kw">bash</span> -x <span class="kw">&lt;</span>script.sh<span class="kw">&gt;</span>
+
+<span class="co"># 代码片段临时开启调试模式</span>
+<span class="kw">set</span> <span class="kw">-x</span>          <span class="co"># activate debugging from here</span>
+<span class="kw">w</span>
+<span class="kw">set</span> <span class="kw">+x</span>          <span class="co"># stop debugging from here</span>
+
+<span class="co"># 写文件</span>
+<span class="kw">echo</span> -e <span class="st">&quot;</span><span class="ot">$msg</span><span class="st">&quot;</span> <span class="kw">&gt;&gt;</span> /tmp/debug.log
+
+<span class="co"># 如果打印变量内容包含「不可打印字符」</span>
+<span class="co"># msg=&quot;hello world\x01\x02&quot;</span>
+<span class="kw">echo</span> -n -e <span class="st">&quot;</span><span class="ot">$msg</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="kw">xxd</span> -p <span class="kw">&gt;&gt;</span> /tmp/debug.log</code></pre></div>
+<h1 id="给脚本传参">给脚本传参</h1>
+<hr />
+<ul>
+<li>参照使用C语言代码编写的命令行可执行程序传参语法规范</li>
+<li>参数与参数之间、脚本文件名与参数之间使用1个或多个空格分隔</li>
+<li><code>$0</code> 指代脚本文件本身</li>
+<li><code>$1</code> 指代命令行上的第1个参数</li>
+<li><code>$2</code> 指代命令行上的第2个参数，以此类推其他参数的脚本内引用方法</li>
+<li><code>$@</code> 指代命令行上的所有参数（参数数组）</li>
+<li><code>$#</code> 指代命令行上的参数个数（参数数组大小）</li>
+</ul>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+<span class="co"># 将本段代码复制粘贴保存为一个文件，假设文件名为：test.sh</span>
+<span class="kw">echo</span> <span class="ot">$3</span> <span class="co"># --&gt; results with: banana</span>
+
+<span class="ot">BIG=$5</span>
+
+<span class="kw">echo</span> <span class="st">&quot;A </span><span class="ot">$BIG</span><span class="st"> costs just </span><span class="ot">$6</span><span class="st">&quot;</span>
+
+<span class="co"># 输出所有参数</span>
+<span class="kw">echo</span> <span class="st">&quot;</span><span class="ot">$@</span><span class="st">&quot;</span>
+
+<span class="co"># 以下代码输出命令行参数的总数</span>
+<span class="kw">echo</span> <span class="ot">$#</span></code></pre></div>
+<p>用以下方法执行该脚本，观察脚本输出结果</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">bash</span> test.sh apple 5 banana 8 <span class="st">&quot;Fruit Basket&quot;</span> 15</code></pre></div>
+<h1 id="数组">数组</h1>
+<hr />
+<ul>
+<li><a href="https://www.tldp.org/LDP/abs/html/bashver4.html">Bash 4.0 开始支持关联数组</a></li>
+<li><code>declare -a</code> 声明的是「索引」数组，<code>declare -A</code> 声明的是「关联」数组。<a href="https://www.gnu.org/software/bash/manual/html_node/Arrays.html">如果同时使用 <code>-a -A</code> ，<code>-A</code> 优先级更高，数组被声明为「关联」数组</a></li>
+<li><a href="https://stackoverflow.com/questions/10806357/associative-arrays-are-local-by-default">Bash 4.2</a> 开始支持 <code>declare -g</code> 方式声明关联数组为「全局」变量，在此之前，关联数组仅限局部变量作用域</li>
+</ul>
+<hr />
+<h2 id="示例">示例</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 查看当前 Bash 的 declare 支持的参数</span>
+<span class="co"># help declare</span>
+
+<span class="co"># 声明一个「索引」数组</span>
+<span class="kw">declare</span> -a <span class="ot">indexed_arr</span>
+
+<span class="co"># 声明一个「关联」数组</span>
+<span class="kw">declare</span> -A <span class="ot">associative_arr</span>
+
+<span class="co"># Bash 数组赋值方法如下</span>
+<span class="co"># 「索引」数组可以跳过数组声明直接赋值的同时即完成了数组初始化</span>
+<span class="ot">my_array=(</span>apple banana <span class="st">&quot;Fruit Basket&quot;</span> orange<span class="ot">)</span>
+
+<span class="ot">associative_arr[</span><span class="st">&#39;hello&#39;</span><span class="ot">]=</span><span class="st">&#39;world&#39;</span>
+<span class="ot">associative_arr[</span><span class="st">&#39;well&#39;</span><span class="ot">]=</span><span class="st">&#39;done&#39;</span>
+
+<span class="co"># bash支持“稀疏”数组：即数组元素不必连续存在，个别索引位置上可以有未初始化的元素</span>
+<span class="ot">new_array[2]=</span>apricot
+
+<span class="co"># 数组元素的个数通过 ${#arrayname[@]} 获得</span>
+<span class="kw">echo</span> <span class="ot">${#my_array[@]}</span>
+
+<span class="co"># 随机读取数组中的元素，{}是必须有的</span>
+<span class="kw">echo</span> <span class="ot">${my_array[2]}</span>
+<span class="co"># echo $my_array[2] 是错误的读取方法</span>
+
+<span class="co"># 遍历数组的方法</span>
+<span class="co">## 「索引」数组</span>
+<span class="kw">for</span> <span class="kw">ele</span> in <span class="st">&quot;</span><span class="ot">${my_array[@]}</span><span class="st">&quot;</span><span class="kw">;do</span>
+    <span class="kw">echo</span> <span class="st">&quot;</span><span class="ot">$ele</span><span class="st">&quot;</span>
+<span class="kw">done</span>
+
+<span class="co">## 「关联」数组</span>
+<span class="kw">for</span> <span class="kw">key</span> in <span class="st">&quot;</span><span class="ot">${!associative_arr[@]}</span><span class="st">&quot;</span><span class="kw">;do</span>
+    <span class="kw">echo</span> <span class="st">&quot;</span><span class="ot">$key</span><span class="st"> </span><span class="ot">${associative_arr[$key]}</span><span class="st">&quot;</span>
+<span class="kw">done</span></code></pre></div>
+<hr />
+<p>课堂练习</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+<span class="ot">NAMES=(</span> John Eric Jessica <span class="ot">)</span>
+
+<span class="co"># 代码填空，使得以下代码避免输出failed关键字</span>
+<span class="ot">NUMBERS=()</span>  <span class="co"># 构造包含1到10整数的数组</span>
+<span class="ot">STRINGS=()</span>  <span class="co"># 构造分别包含hello和world字符串的数组</span>
+<span class="ot">NumberOfNames=</span>0 <span class="co"># 请使用动态计算数组元素个数的方法</span>
+<span class="ot">second_name=</span><span class="st">&#39;&#39;</span>  <span class="co"># 读取NAMES数组的第2个元素值进行赋值</span>
+
+<span class="co"># 测试代码 - 勿修改</span>
+
+<span class="ot">T_NUMBERS=$(</span><span class="kw">seq</span> 1 10<span class="ot">)</span>
+<span class="ot">T_STRINGS=(</span>hello world<span class="ot">)</span>
+
+<span class="co"># Test Case 1</span>
+<span class="ot">i=</span>0
+<span class="kw">for</span> <span class="kw">n</span> in <span class="ot">${T_NUMBERS[@]}</span><span class="kw">;do</span>
+  <span class="kw">if [[</span> <span class="ot">${n}</span> <span class="ot">-ne</span> <span class="ot">${NUMBERS[${i}]}</span><span class="kw"> ]]</span>;<span class="kw">then</span>
+    <span class="kw">echo</span> <span class="st">&quot;failed in NUMBERS test&quot;</span>
+  <span class="kw">fi</span>
+  <span class="ot">i=$((</span>i+1<span class="ot">))</span>
+<span class="kw">done</span>
+
+<span class="co"># Test Case 2</span>
+<span class="ot">i=</span>0
+<span class="kw">for</span> <span class="kw">n</span> in <span class="ot">${T_STRINGS[@]}</span><span class="kw">;do</span>
+  <span class="kw">if [[</span> <span class="st">&quot;</span><span class="ot">${n}</span><span class="st">&quot;</span> <span class="ot">!=</span> <span class="st">&quot;</span><span class="ot">${STRINGS[${i}]}</span><span class="st">&quot;</span><span class="kw"> ]]</span>;<span class="kw">then</span>
+    <span class="kw">echo</span> <span class="st">&quot;failed in STRINGS test&quot;</span>
+  <span class="kw">fi</span>
+  <span class="ot">i=$((</span>i+1<span class="ot">))</span>
+<span class="kw">done</span>
+
+<span class="co"># Test Case 3</span>
+<span class="kw">if [[</span> <span class="ot">$NumberOfNames</span> <span class="ot">-ne</span> <span class="ot">${#NAMES[@]}</span><span class="kw"> ]]</span>;<span class="kw">then</span>
+    <span class="kw">echo</span> <span class="st">&quot;failed in NumberOfNames test&quot;</span>
+<span class="kw">fi</span>
+
+<span class="co"># Test Case 4</span>
+<span class="kw">if [[</span> <span class="st">&quot;</span><span class="ot">${NAMES[1]}</span><span class="st">&quot;</span> <span class="ot">!=</span> <span class="st">&quot;</span><span class="ot">${second_name}</span><span class="st">&quot;</span><span class="kw"> ]]</span>;<span class="kw">then</span>
+  <span class="kw">echo</span> <span class="st">&quot;failed in Array Element Access test&quot;</span>
+<span class="kw">fi</span></code></pre></div>
+<h1 id="基本算术运算">基本算术运算</h1>
+<hr />
+<p>使用 <strong>$((expression))</strong> 算术运算符表达式，注意这种方式只支持 <strong><font color='red'>整数</font>运算</strong></p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">A=</span>3
+<span class="ot">B=$((</span>100 * A + 5<span class="ot">))</span> <span class="co"># 305</span></code></pre></div>
+<ul>
+<li>a + b addition (a plus b)</li>
+<li>a - b substraction (a minus b)</li>
+<li>a * b multiplication (a times b)</li>
+<li>a / b division (integer) (a divided by b)</li>
+<li>a % b modulo (the integer remainder of a divided by b)</li>
+<li>a ** b exponentiation (a to the power of b)</li>
+</ul>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 进阶算术运算请使用命令行工具 bc</span>
+
+<span class="co"># 计算 4 * arctangent(1) ，计算结果保留 10 位有效数字</span>
+<span class="co"># -l 表示使用标准数学库</span>
+<span class="ot">pi=$(</span><span class="kw">echo</span> <span class="st">&quot;scale=10; 4*a(1)&quot;</span> <span class="kw">|</span> <span class="kw">bc</span> -l<span class="ot">)</span>
+
+<span class="co"># 计算 4 * arctangent(1) ，计算结果保留 1000 位有效数字</span>
+<span class="co"># 禁止输出结果因超长而自动折行</span>
+<span class="ot">pi=$(BC_LINE_LENGTH=</span>0 <span class="kw">bc</span> -l <span class="kw">&lt;&lt;&lt;</span> <span class="st">&quot;scale=1000; 4*a(1)&quot;</span><span class="ot">)</span></code></pre></div>
+<h1 id="基本字符串操作">基本字符串操作</h1>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 获得字符串长度值</span>
+<span class="ot">STRING=</span><span class="st">&quot;this is a string&quot;</span>
+<span class="kw">echo</span> <span class="ot">${#STRING}</span>            <span class="co"># 16</span>
+
+<span class="co"># 注意非拉丁语系字符串长度计算</span>
+<span class="ot">M_STRING=</span><span class="st">&quot;中文&quot;</span>
+<span class="kw">export</span> <span class="ot">LANG=</span>C.UTF-8
+<span class="kw">echo</span> <span class="ot">${#M_STRING}</span>            <span class="co"># 2</span>
+<span class="kw">export</span> <span class="ot">LANG=</span>C
+<span class="kw">echo</span> <span class="ot">${#M_STRING}</span>            <span class="co"># 6</span>
+
+<span class="co"># 字符串截取子串</span>
+<span class="ot">STRING=</span><span class="st">&quot;this is a string&quot;</span>
+<span class="ot">POS=</span>1
+<span class="ot">LEN=</span>3
+<span class="kw">echo</span> <span class="ot">${STRING:$POS:$LEN}</span>   <span class="co"># his</span>
+<span class="kw">echo</span> <span class="ot">${STRING:1}</span>           <span class="co"># $STRING contents without leading character</span>
+<span class="kw">echo</span> <span class="ot">${STRING:12}</span>          <span class="co"># ring</span>
+
+<span class="co"># 注意非拉丁语系字符串截取</span>
+<span class="kw">export</span> <span class="ot">LANG=</span>C
+<span class="kw">echo</span> -n <span class="st">&quot;</span><span class="ot">${M_STRING:0:1}</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="kw">xxd</span> -p <span class="co"># e4</span>
+<span class="kw">export</span> <span class="ot">LANG=</span>C.UTF-8
+<span class="kw">echo</span> -n <span class="st">&quot;</span><span class="ot">${M_STRING:0:1}</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="kw">xxd</span> -p <span class="co"># e4b8ad</span>
+
+<span class="co"># 字符串查找并替换第一次匹配到的子串</span>
+<span class="ot">STRING=</span><span class="st">&quot;to be or not to be&quot;</span>
+<span class="kw">echo</span> <span class="ot">${STRING[@]/</span>be<span class="ot">/</span>eat<span class="ot">}</span>   <span class="co"># to eat or not to be</span></code></pre></div>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 字符串查找并替换所有匹配到的子串</span>
+<span class="ot">STRING=</span><span class="st">&quot;to be or not to be&quot;</span>
+<span class="kw">echo</span> <span class="ot">${STRING[@]//</span>be<span class="ot">/</span>eat<span class="ot">}</span>  <span class="co"># to eat or not to eat</span>
+
+<span class="co"># 字符串查找并删除（替换为空）所有匹配到的子串</span>
+<span class="ot">STRING=</span><span class="st">&quot;to be or not to be&quot;</span>
+<span class="kw">echo</span> <span class="ot">${STRING[@]//</span> not<span class="ot">/}</span>        <span class="co"># to be or to be</span>
+
+<span class="co"># 字符串查找并替换匹配到行首的子串</span>
+<span class="ot">STRING=</span><span class="st">&quot;to be or not to be&quot;</span>
+<span class="kw">echo</span> <span class="ot">${STRING[@]/</span>#to be<span class="ot">/</span>eat now<span class="ot">}</span>    <span class="co"># eat now or not to be</span>
+
+<span class="co"># 字符串查找并替换匹配到行尾的子串</span>
+<span class="ot">STRING=</span><span class="st">&quot;to be or not to be&quot;</span>
+<span class="kw">echo</span> <span class="ot">${STRING[@]/</span>%be<span class="ot">/</span>eat<span class="ot">}</span>        <span class="co"># to be or not to eat</span>
+
+<span class="co"># 字符串查找并使用子命令输出结果替换匹配项</span>
+<span class="ot">STRING=</span><span class="st">&quot;to be or not to be&quot;</span>
+<span class="kw">echo</span> <span class="ot">${STRING[@]/</span>%be<span class="ot">/</span>be on <span class="ot">$(</span><span class="kw">date</span> +%Y-%m-%d<span class="ot">)}</span>    <span class="co"># to be or not to be on 2012-06-14</span></code></pre></div>
+<h1 id="条件判断">条件判断</h1>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">
+<span class="kw">if [</span> expression<span class="kw"> ]</span>; <span class="kw">then</span>
+
+<span class="co"># code if &#39;expression&#39; is true</span>
+
+<span class="kw">elif [</span> expression<span class="kw"> ]</span>; <span class="kw">then</span>
+
+<span class="co"># code if &#39;expression&#39; is true</span>
+
+<span class="kw">else</span>
+
+<span class="co"># other conditions</span>
+
+<span class="kw">fi</span></code></pre></div>
+<hr />
+<p><a href="http://stackoverflow.com/questions/669452/is-preferable-over-in-bash-scripts">[]和[[]]的区别</a></p>
+<ul>
+<li><code>[</code> 实质上命令 <code>test</code> 的另一种形式，<code>[[</code> 是一种更符合你期望的 <code>test</code> 命令</li>
+<li><code>[</code> 符合 POSIX 标准，<code>[[</code> 不符合 POSIX 标准</li>
+<li>现代 Linux 发行版自带的 shell 环境普遍支持 <code>[[</code> ，推荐优先使用（除非需要考虑兼容古老 shell）</li>
+</ul>
+<hr />
+<p>bash支持的表达式类型</p>
+<ul>
+<li>单个字符串（常量）或者变量</li>
+<li>恒假表达式
+<ul>
+<li>空字符串</li>
+<li>未定义变量名</li>
+</ul></li>
+<li>逻辑运算符
+<ul>
+<li>! 取反</li>
+<li>&amp;&amp; 逻辑与</li>
+<li>|| 逻辑或</li>
+</ul></li>
+<li>使用逻辑运算符构成的条件表达式应使用 <strong>[[ ]]</strong>包围</li>
+</ul>
+<hr />
+<h2 id="小测验">小测验</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 以下代码执行完毕后的输出结果是什么？</span>
+<span class="kw">if [[</span> 0<span class="kw"> ]]</span>;<span class="kw">then</span> <span class="kw">printf</span> <span class="st">&quot;%d&quot;</span> 0<span class="kw">;fi</span>
+<span class="kw">if [[</span> 1<span class="kw"> ]]</span>;<span class="kw">then</span> <span class="kw">printf</span> <span class="st">&quot;%d&quot;</span> 1<span class="kw">;fi</span>
+<span class="kw">if [[</span> true<span class="kw"> ]]</span>;<span class="kw">then</span> <span class="kw">printf</span> <span class="st">&quot;%d&quot;</span> 2<span class="kw">;fi</span>
+<span class="kw">if [[</span> false<span class="kw"> ]]</span>;<span class="kw">then</span> <span class="kw">printf</span> <span class="st">&quot;%d&quot;</span> 3<span class="kw">;fi</span>
+<span class="kw">if [[</span> <span class="st">&#39;&#39;</span><span class="kw"> ]]</span>;<span class="kw">then</span> <span class="kw">printf</span> <span class="st">&quot;%d&quot;</span> 4<span class="kw">;fi</span>
+<span class="kw">if [[</span> <span class="st">&#39;   &#39;</span><span class="kw"> ]]</span>;<span class="kw">then</span> <span class="kw">printf</span> <span class="st">&quot;%d&quot;</span> 5<span class="kw">;fi</span>
+<span class="kw">if [[</span> <span class="st">&#39;true&#39;</span><span class="kw"> ]]</span>;<span class="kw">then</span> <span class="kw">printf</span> <span class="st">&quot;%d&quot;</span> 6<span class="kw">;fi</span>
+<span class="kw">if [[</span> <span class="st">&#39;false&#39;</span><span class="kw"> ]]</span>;<span class="kw">then</span> <span class="kw">printf</span> <span class="st">&quot;%d&quot;</span> 7<span class="kw">;fi</span>
+<span class="kw">if [[</span> <span class="st">&#39;$mamashuozhegebianliangbukenengdingyiguo&#39;</span><span class="kw"> ]]</span>;<span class="kw">then</span> <span class="kw">printf</span> <span class="st">&quot;%d&quot;</span> 8<span class="kw">;fi</span>
+<span class="kw">if [[</span> <span class="st">&quot;</span><span class="ot">$mamashuozhegebianliangbukenengdingyiguo</span><span class="st">&quot;</span><span class="kw"> ]]</span>;<span class="kw">then</span> <span class="kw">printf</span> <span class="st">&quot;%d&quot;</span> 9<span class="kw">;fi</span></code></pre></div>
+<hr />
+<h2 id="section">01235678</h2>
+<hr />
+<p><font color='red'>数值</font>比较运算表达式</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">比较运算表达式</th>
+<th style="text-align: center;">真值条件</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">$a -lt $b</td>
+<td style="text-align: center;">$a &lt; $b</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">$a -gt $b</td>
+<td style="text-align: center;">$a &gt; $b</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">$a -le $b</td>
+<td style="text-align: center;">$a &lt;= $b</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">$a -ge $b</td>
+<td style="text-align: center;">$a &gt;= $b</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">$a -eq $b</td>
+<td style="text-align: center;">$a is equal to $b</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">$a -ne $b</td>
+<td style="text-align: center;">$a is not equal to $b</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><font color='red'>字符串</font>比较表达式</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">比较表达式</th>
+<th style="text-align: center;">真值条件</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">&quot;$a&quot; = &quot;$b&quot;</td>
+<td style="text-align: center;">$a is the same as $b</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">&quot;$a&quot; == &quot;$b&quot;</td>
+<td style="text-align: center;">$a is the same as $b</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">&quot;$a&quot; != &quot;$b&quot;</td>
+<td style="text-align: center;">$a is different from $b</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">-z &quot;$a&quot;</td>
+<td style="text-align: center;">$a is empty</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>注意：上面表达式中的双引号不能省略，避免字符串中包含的空格会改变表达式的语义</p>
+</blockquote>
+<hr />
+<p>选择条件分支</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">case</span> <span class="st">&quot;</span><span class="ot">$variable</span><span class="st">&quot;</span><span class="kw"> in</span>
+    <span class="st">&quot;</span><span class="ot">$condition1</span><span class="st">&quot;</span> <span class="kw">)</span>
+        <span class="kw">command...</span>
+    <span class="kw">;;</span>
+    <span class="st">&quot;</span><span class="ot">$condition2</span><span class="st">&quot;</span> <span class="kw">)</span>
+        <span class="kw">command...</span>
+    <span class="kw">;;</span>
+<span class="kw">esac</span></code></pre></div>
+<hr />
+<p>一个实例</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">mycase=</span>1
+<span class="kw">case</span> <span class="ot">$mycase</span><span class="kw"> in</span>
+    1<span class="kw">)</span> <span class="kw">echo</span> <span class="st">&quot;You selected bash&quot;</span><span class="kw">;;</span>
+    <span class="kw">2</span>) <span class="kw">echo</span> <span class="st">&quot;You selected perl&quot;</span><span class="kw">;;</span>
+    <span class="kw">3</span>) <span class="kw">echo</span> <span class="st">&quot;You selected phyton&quot;</span><span class="kw">;;</span>
+    <span class="kw">4</span>) <span class="kw">echo</span> <span class="st">&quot;You selected c++&quot;</span><span class="kw">;;</span>
+    <span class="kw">5</span>) <span class="kw">exit</span>
+<span class="kw">esac</span></code></pre></div>
+<h1 id="循环">循环</h1>
+<hr />
+<p>for循环</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># basic construct</span>
+<span class="kw">for</span> <span class="kw">arg</span> in [list]
+<span class="kw">do</span>
+ <span class="kw">command</span>(s)<span class="kw">...</span>
+<span class="kw">done</span>
+
+<span class="co"># 单行结构</span>
+<span class="kw">for</span> <span class="kw">arg</span> in [list]<span class="kw">;do</span> <span class="kw">command</span>(s)<span class="kw">...;done</span></code></pre></div>
+<hr />
+<p>2个实例</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># loop on array member</span>
+<span class="ot">NAMES=(</span>Joe Jenny Sara Tony<span class="ot">)</span>
+<span class="kw">for</span> <span class="kw">N</span> in <span class="ot">${NAMES[@]}</span> <span class="kw">;</span> <span class="kw">do</span>
+  <span class="kw">echo</span> <span class="st">&quot;My name is </span><span class="ot">$N</span><span class="st">&quot;</span>
+<span class="kw">done</span>
+
+<span class="co"># loop on command output results</span>
+<span class="kw">for</span> <span class="kw">f</span> in <span class="ot">$(</span><span class="kw">ps</span> -eo command<span class="ot">)</span> <span class="kw">;</span> <span class="kw">do</span>
+  <span class="kw">ls</span> <span class="st">&quot;</span><span class="ot">$f</span><span class="st">&quot;</span>
+<span class="kw">done</span></code></pre></div>
+<hr />
+<p>while循环</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># basic construct</span>
+<span class="kw">while [</span> condition<span class="kw"> ]</span>
+<span class="kw">do</span>
+ <span class="kw">command</span>(s)<span class="kw">...</span>
+<span class="kw">done</span>
+
+<span class="co"># 模拟 do .. while 循环</span>
+<span class="kw">while [</span> :<span class="kw"> ]</span>;<span class="kw">do</span>
+  <span class="kw">if [</span> condition<span class="kw"> ]</span>;<span class="kw">then</span>
+    <span class="kw">break</span>
+  <span class="kw">fi</span>
+  <span class="kw">command</span>(s)<span class="kw">...</span>
+<span class="kw">done</span></code></pre></div>
+<hr />
+<p>1个实例</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">COUNT=</span>4
+<span class="kw">while [</span> <span class="ot">$COUNT</span> <span class="ot">-gt</span> 0<span class="kw"> ]</span>; <span class="kw">do</span>
+  <span class="kw">echo</span> <span class="st">&quot;Value of count is: </span><span class="ot">$COUNT</span><span class="st">&quot;</span>
+  <span class="ot">COUNT=$(($COUNT</span> - 1<span class="ot">))</span>
+<span class="kw">done</span>
+
+<span class="ot">COUNT=</span>4
+<span class="kw">while [</span> :<span class="kw"> ]</span>; <span class="kw">do</span>
+  <span class="kw">echo</span> <span class="st">&quot;Value of count is: </span><span class="ot">$COUNT</span><span class="st">&quot;</span>
+  <span class="ot">COUNT=$(($COUNT</span> - 1<span class="ot">))</span>
+  <span class="kw">if [[</span> <span class="ot">$COUNT</span> <span class="ot">-eq</span> 0<span class="kw"> ]]</span>;<span class="kw">then</span>
+     <span class="kw">break</span>
+  <span class="kw">fi</span>
+<span class="kw">done</span></code></pre></div>
+<hr />
+<p>until循环</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># basic construct</span>
+<span class="kw">until [</span> condition<span class="kw"> ]</span>
+<span class="kw">do</span>
+ <span class="kw">command</span>(s)<span class="kw">...</span>
+<span class="kw">done</span></code></pre></div>
+<blockquote>
+<p>说明：until条件为假时，执行循环体内代码。为真时，跳过循环体代码段。</p>
+</blockquote>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">COUNT=</span>1
+<span class="kw">until [</span> <span class="ot">$COUNT</span> <span class="ot">-gt</span> 5<span class="kw"> ]</span>; <span class="kw">do</span>
+  <span class="kw">echo</span> <span class="st">&quot;Value of count is: </span><span class="ot">$COUNT</span><span class="st">&quot;</span>
+  <span class="ot">COUNT=$(($COUNT</span> + 1<span class="ot">))</span>
+<span class="kw">done</span></code></pre></div>
+<hr />
+<p>循环控制</p>
+<ul>
+<li>break 跳过本层循环体剩余部分代码并返回上一级代码片段</li>
+<li>continue 跳过本次循环执行剩余部分代码，继续执行下一次循环条件表达式计算判断</li>
+</ul>
+<hr />
+<p>break和continue的实例代码</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># Prints out 0,1,2,3,4</span>
+
+<span class="ot">COUNT=</span>0
+<span class="kw">while [</span> <span class="ot">$COUNT</span> <span class="ot">-ge</span> 0<span class="kw"> ]</span>; <span class="kw">do</span>
+  <span class="kw">echo</span> <span class="st">&quot;Value of COUNT is: </span><span class="ot">$COUNT</span><span class="st">&quot;</span>
+  <span class="ot">COUNT=$((</span>COUNT+1<span class="ot">))</span>
+  <span class="kw">if [</span> <span class="ot">$COUNT</span> <span class="ot">-ge</span> 5<span class="kw"> ]</span> ; <span class="kw">then</span>
+    <span class="kw">break</span>
+  <span class="kw">fi</span>
+<span class="kw">done</span>
+
+<span class="co"># Prints out only odd numbers - 1,3,5,7,9</span>
+<span class="ot">COUNT=</span>0
+<span class="kw">while [</span> <span class="ot">$COUNT</span> <span class="ot">-lt</span> 10<span class="kw"> ]</span>; <span class="kw">do</span>
+  <span class="ot">COUNT=$((</span>COUNT+1<span class="ot">))</span>
+  <span class="co"># Check if COUNT is even</span>
+  <span class="kw">if [</span> <span class="ot">$(($COUNT</span> % 2<span class="ot">))</span> <span class="ot">=</span> 0<span class="kw"> ]</span> ; <span class="kw">then</span>
+    <span class="kw">continue</span>
+  <span class="kw">fi</span>
+  <span class="kw">echo</span> <span class="ot">$COUNT</span>
+<span class="kw">done</span></code></pre></div>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># loop on command output results 健壮性改进版本</span>
+<span class="kw">set</span> <span class="kw">-e</span>
+<span class="kw">for</span> <span class="kw">f</span> in <span class="ot">$(</span><span class="kw">ps</span> -eo command <span class="kw">2&gt;</span>/dev/null<span class="ot">)</span> <span class="kw">;</span> <span class="kw">do</span>
+ <span class="kw"> [[</span> <span class="ot">-e</span> <span class="st">&quot;</span><span class="ot">$f</span><span class="st">&quot;</span><span class="kw"> ]]</span> <span class="kw">||</span> <span class="kw">continue</span>
+  <span class="kw">ls</span> <span class="st">&quot;</span><span class="ot">$f</span><span class="st">&quot;</span>
+<span class="kw">done</span>
+
+<span class="co"># 下面是改进前的「脆弱」版本，对比执行找不同</span>
+<span class="kw">set</span> <span class="kw">-e</span>
+<span class="kw">for</span> <span class="kw">f</span> in <span class="ot">$(</span><span class="kw">ps</span> -eo command<span class="ot">)</span> <span class="kw">;</span> <span class="kw">do</span>
+  <span class="kw">ls</span> <span class="st">&quot;</span><span class="ot">$f</span><span class="st">&quot;</span>
+<span class="kw">done</span></code></pre></div>
+<h1 id="编写健壮的-shell-脚本">编写健壮的 shell 脚本</h1>
+<hr />
+<h2 id="fail-fast-避免错误蔓延"><a href="https://dzone.com/articles/fail-fast-principle-in-software-development">Fail-Fast: 避免错误蔓延</a></h2>
+<ul>
+<li>越早期的 Bug 越容易被检测到、发现，从而可以更快被修复
+<ul>
+<li>执行过但没「崩溃」的代码都是「无 BUG」的</li>
+</ul></li>
+<li>避免一连串 Bug 协同后产生的「雪崩效应」</li>
+</ul>
+<hr />
+<h3 id="fail-fast-的典型应用场景">Fail-Fast 的典型应用场景</h3>
+<ul>
+<li>测试驱动开发</li>
+<li>持续集成</li>
+</ul>
+<hr />
+<p><strong>set -e</strong></p>
+<blockquote>
+<p>脚本只要发生错误，就终止执行</p>
+</blockquote>
+<p><strong>set +e</strong></p>
+<blockquote>
+<p>关闭 -e 选项</p>
+</blockquote>
+<hr />
+<p><strong>set -o pipefail</strong></p>
+<ul>
+<li><code>set -e</code> 不能终止管道命令中执行出错的语句
+<ul>
+<li>只要最后一个子命令不失败，管道命令总是会执行成功</li>
+</ul></li>
+<li><code>set -eo pipefail</code> 可以让脚本在更严格的条件下执行</li>
+</ul>
+<hr />
+<h2 id="使用静态分析工具">使用静态分析工具</h2>
+<ul>
+<li>程序静态分析是指在不运行代码的方式下，通过词法分析、语法分析、控制流分析等技术对程序代码进行扫描，验证代码是否满足规范性、安全性、可靠性、可维护性等指标的一种代码分析技术。</li>
+<li>静态分析的一个重要优势是能够在代码中出现大量错误后立刻检测到，因此修复这些错误的成本也不会过高。越早检测到错误，更正错误的成本越低。</li>
+</ul>
+<hr />
+<h3 id="shellcheck---shell-脚本静态分析工具"><a href="https://github.com/koalaman/shellcheck">shellcheck</a> - shell 脚本静态分析工具</h3>
+<figure>
+<img src="images/chap0x04/shellcheck-in-vim.png" alt="shellcheck in vim" /><figcaption>shellcheck in vim</figcaption>
+</figure>
+<h1 id="函数">函数</h1>
+<hr />
+<blockquote>
+<p>DRY: Don't Repeat Yourself</p>
+</blockquote>
+<p>函数定义</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 基本定义方法，可移植性最好</span>
+<span class="fu">function_name ()</span> <span class="kw">compound-command</span> [ redirections ]
+
+<span class="co"># 现代主流shell解释权均支持的语法，可以避免alias机制污染函数名</span>
+<span class="kw">function</span><span class="fu"> function_name</span> [<span class="kw">()</span>] <span class="kw">compound-command</span> [ redirections ]</code></pre></div>
+<blockquote>
+<p><a href="http://unix.stackexchange.com/questions/73750/difference-between-function-foo-and-foo">function关键字是可选的，主要区别在于可移植性</a></p>
+</blockquote>
+<hr />
+<p>函数调用、传参和参数处理</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">function</span><span class="fu"> function_B</span> <span class="kw">{</span>
+  <span class="kw">echo</span> <span class="st">&quot;Function B.&quot;</span>
+<span class="kw">}</span>
+<span class="kw">function</span><span class="fu"> function_A</span> <span class="kw">{</span>
+  <span class="kw">echo</span> <span class="st">&quot;</span><span class="ot">$1</span><span class="st">&quot;</span>
+<span class="kw">}</span>
+<span class="kw">function</span><span class="fu"> adder</span> <span class="kw">{</span>
+  <span class="kw">echo</span> <span class="st">&quot;</span><span class="ot">$(($1</span> + <span class="ot">$2))</span><span class="st">&quot;</span>
+<span class="kw">}</span>
+
+<span class="co"># 调用函数，传参</span>
+<span class="kw">function_A</span> <span class="st">&quot;Function A.&quot;</span>     <span class="co"># Function A.</span>
+<span class="kw">function_B</span>                   <span class="co"># Function B.</span>
+<span class="kw">adder</span> 12 56                  <span class="co"># 68</span></code></pre></div>
+<h1 id="课内练习">课内练习</h1>
+<hr />
+<p>求2个数的最大公约数，要求：</p>
+<ul>
+<li>通过命令行参数读取2个整数，对不符合参数调用规范（使用小数、字符、少于2个参数等）的脚本执行要给出明确的错误提示信息，并退出代码执行</li>
+</ul>
+<h1 id="进阶主题">进阶主题</h1>
+<hr />
+<ul>
+<li>特殊变量</li>
+<li>文件读写</li>
+</ul>
+<hr />
+<h2 id="特殊变量">特殊变量</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">$0</span> <span class="co"># 当前脚本的文件名</span>
+<span class="ot">$n</span> <span class="co"># 脚本或函数的第N个传入参数</span>
+<span class="ot">$#</span> <span class="co"># 脚本或函数传入参数的个数</span>
+<span class="ot">$@</span> <span class="co"># 脚本或函数传入的所有参数（数组形式）</span>
+<span class="ot">$*</span> <span class="co"># 脚本或函数传入的所有参数（字符串形式）</span>
+<span class="ot">$?</span> <span class="co"># 最近一条命令或函数的退出状态码</span>
+<span class="ot">$$</span> <span class="co"># 当前shell解释器的进程编号，对脚本来说就是当前脚本解释器的进程编号</span>
+<span class="ot">$!</span> <span class="co"># 最近一个进入后台执行的进程的进程编号</span></code></pre></div>
+<hr />
+<h2 id="文件读写">文件读写</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 利用I/O重定向机制</span>
+
+<span class="co"># 清空一个文件（文件大小变为0）</span>
+<span class="kw">&gt;</span> <span class="kw">file</span>
+<span class="co"># 用一段文本内容覆盖一个文件</span>
+<span class="kw">echo</span> <span class="st">&quot;some string&quot;</span> <span class="kw">&gt;</span> file
+<span class="co"># 在文件尾部追加内容</span>
+<span class="kw">echo</span> <span class="st">&quot;some string&quot;</span> <span class="kw">&gt;&gt;</span> file
+
+<span class="co"># 读取文件的第一行并将其赋值给一个变量</span>
+
+<span class="co"># read是bash的内置函数</span>
+<span class="co"># read命令会从标准输入读取一行，并将其赋值给变量line。-r选项表示read将读取原生内容，所有字符都不会被转义，例如反斜线不会用于转义（只是反斜线）。输入重定向命令&quot;&lt;file&quot;会打开文件并执行读操作，并且会将读取的内容以标准输入的形式提供给read命令。</span>
+<span class="kw">read</span> -r <span class="ot">line</span> <span class="kw">&lt;</span> <span class="kw">file</span>
+<span class="co"># read命令会删除特殊变量IFS所表示的字符。IFS是Internal Field Separator（内部字段分隔符）的缩写，它的值为用于分隔单词和行的字符组成的字符串。IFS的默认值为空格符、制表符和换行符组成的字符串。这意味着前导和尾随的空格符和制表符都会被删除。如果你想保留这些字符，你可以将IFS设置为空字符：</span>
+<span class="ot">IFS=</span> <span class="kw">read</span> -r <span class="ot">line</span> <span class="kw">&lt;</span> <span class="kw">file</span>
+<span class="co"># 利用外部程序head</span>
+<span class="ot">line=$(</span><span class="kw">head</span> -1 file<span class="ot">)</span>
+<span class="ot">line=</span><span class="kw">`head</span> -1 file<span class="kw">`</span>
+
+<span class="co"># 构造一个「畸形」测试用例</span>
+<span class="kw">echo</span> -n -e <span class="st">&quot; 123 \x0a456&quot;</span> <span class="kw">&gt;</span> file
+<span class="co"># 逐行读文件 **有 BUG**</span>
+<span class="kw">while</span> <span class="kw">read</span> -r <span class="ot">line</span>; <span class="kw">do</span>
+      <span class="co"># do something with $line</span>
+      <span class="kw">echo</span> <span class="st">&quot;</span><span class="ot">$line</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="kw">xxd</span> -p
+<span class="kw">done</span> <span class="kw">&lt;</span> <span class="kw">file</span>
+<span class="co"># 逐行读文件，防止行两端的空白字符被删除 **依然有 BUG**</span>
+<span class="kw">while</span> <span class="ot">IFS=</span> <span class="kw">read</span> -r <span class="ot">line</span>; <span class="kw">do</span>
+      <span class="co"># do something with $line</span>
+      <span class="kw">echo</span> <span class="st">&quot;</span><span class="ot">$line</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="kw">xxd</span> -p
+<span class="kw">done</span> <span class="kw">&lt;</span> <span class="kw">file</span>
+<span class="co"># 文件读写的最佳实践</span>
+<span class="kw">while</span> <span class="ot">IFS=</span> <span class="kw">read</span> -r <span class="ot">line</span> <span class="kw">|| [[</span> <span class="ot">-n</span> <span class="st">&quot;</span><span class="ot">$line</span><span class="st">&quot;</span><span class="kw"> ]]</span>; <span class="kw">do</span>
+      <span class="co"># do something with $line</span>
+      <span class="kw">echo</span> <span class="st">&quot;</span><span class="ot">$line</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="kw">xxd</span> -p
+<span class="kw">done</span> <span class="kw">&lt;</span> <span class="kw">file</span></code></pre></div>
+<h1 id="实战例子---校园网账号自动登录的bash脚本实现">实战例子 - 校园网账号自动登录的bash脚本实现</h1>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+<span class="ot">urls=(</span><span class="st">&quot;https://www.taobao.com&quot;</span> <span class="st">&quot;http://www.qq.com&quot;</span> <span class="st">&quot;https://www.baidu.com&quot;</span><span class="ot">)</span>
+<span class="ot">fbs=(</span><span class="st">&quot;taobao.com&quot;</span> <span class="st">&quot;qq.com&quot;</span> <span class="st">&quot;baidu.com&quot;</span><span class="ot">)</span>
+<span class="ot">count=${#urls[@]}</span>
+<span class="ot">err=</span>1
+<span class="ot">bench=</span><span class="kw">`expr</span> <span class="ot">$count</span> - <span class="ot">$err</span><span class="kw">`</span>
+
+<span class="co"># login variables</span>
+<span class="ot">uid=</span><span class="st">&quot;[your_uid]&quot;</span>
+<span class="ot">psw=</span><span class="st">&quot;[your_psw_extracted_from_account.cuc.edu.cn_login_post]&quot;</span> <span class="co"># 注意一定要使用URL编码之后的数据</span>
+
+<span class="co"># cookie文件持久化存储路径</span>
+<span class="ot">cookie_file=</span><span class="st">&quot;acuc.txt&quot;</span>
+
+<span class="ot">UA=</span><span class="st">&quot;Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.772.0 Safari/535.1&quot;</span>
+
+<span class="co"># 校园网认证首页</span>
+<span class="ot">index_url=</span><span class="st">&quot;http://account.cuc.edu.cn/connect/index.jsp&quot;</span>
+
+<span class="co"># 校园网登录API</span>
+<span class="ot">login_url=</span><span class="st">&quot;http://account.cuc.edu.cn/connect/ws/ws_login.jsp?act=2&amp;userid=</span><span class="ot">${uid}</span><span class="st">&amp;passwd=</span><span class="ot">${psw}</span><span class="st">&amp;act=2&quot;</span>
+
+<span class="co"># 校园网认证心跳API</span>
+<span class="ot">hb_url_0=</span><span class="st">&quot;http://account.cuc.edu.cn/connect/ws/ws_action.jsp?act=4&quot;</span> <span class="co"># 认证成功后，只联接校园网，需要通过该API完成联接互联网</span>
+<span class="ot">hb_url_1=</span><span class="st">&quot;http://account.cuc.edu.cn/connect/ws/ws_action.jsp?act=6&quot;</span>
+<span class="ot">hb_url_2=</span><span class="st">&quot;http://account.cuc.edu.cn/connect/ws/ws_action.jsp?act=7&quot;</span>
+
+<span class="co"># 校园网注销API</span>
+<span class="ot">logout_url=</span><span class="st">&quot;http://account.cuc.edu.cn/connect/ws/ws_login.jsp?act=3&quot;</span>
+
+<span class="co"># 调试用文件路径</span>
+<span class="ot">log_result=</span><span class="st">&quot;res.html&quot;</span>
+
+<span class="fu">isNetworkConnected()</span> <span class="kw">{</span>
+  <span class="ot">success=</span>0;
+  <span class="kw">for((</span>i=0;i&lt;<span class="ot">$count</span>;i++<span class="kw">))</span>;<span class="kw">do</span>
+    <span class="ot">url=${urls[$i]}</span>;
+    <span class="ot">fb=${fbs[$i]}</span>;
+    <span class="ot">res=</span><span class="kw">`curl</span> -s -4 -m 5 <span class="ot">$url</span><span class="kw">`</span>;
+    <span class="kw">if [[</span> <span class="ot">$res</span> =~ <span class="ot">$fb</span><span class="kw"> ]]</span>;<span class="kw">then</span>
+      <span class="kw">((</span>success++<span class="kw">))</span>;
+    <span class="kw">fi</span>
+  <span class="kw">done</span>
+
+  <span class="kw">if [</span> <span class="ot">$success</span> <span class="ot">-gt</span> <span class="ot">$bench</span><span class="kw"> ]</span>;<span class="kw">then</span>
+    <span class="ot">connected=</span>1; <span class="co"># connected to internet</span>
+  <span class="kw">else</span>
+    <span class="ot">connected=</span>0; <span class="co"># connection error</span>
+  <span class="kw">fi</span>
+  <span class="kw">echo</span> <span class="ot">$connected</span><span class="kw">;</span>
+<span class="kw">}</span>
+
+
+<span class="fu">keep_connected()</span> <span class="kw">{</span>
+  <span class="kw">curl</span> -k -e <span class="st">&quot;</span><span class="ot">$index_url</span><span class="st">&quot;</span> -b <span class="st">&quot;</span><span class="ot">$cookie_file</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="ot">$hb_url_1</span><span class="st">&quot;</span>
+  <span class="kw">curl</span> -k -e <span class="st">&quot;</span><span class="ot">$index_url</span><span class="st">&quot;</span> -b <span class="st">&quot;</span><span class="ot">$cookie_file</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="ot">$hb_url_2</span><span class="st">&quot;</span>
+<span class="kw">}</span>
+
+<span class="fu">log_out()</span> <span class="kw">{</span>
+  <span class="kw">curl</span> -k -e <span class="st">&quot;</span><span class="ot">$index_url</span><span class="st">&quot;</span> -b <span class="ot">$cookie_file</span> <span class="st">&quot;</span><span class="ot">$logout_url</span><span class="st">&quot;</span> <span class="co"># 先注销，再联网，避免重复登录</span>
+<span class="kw">}</span>
+
+<span class="fu">connect_lan()</span> <span class="kw">{</span>
+  <span class="co"># 连接校园网</span>
+  <span class="kw">curl</span> -k -c <span class="st">&quot;</span><span class="ot">$cookie_file</span><span class="st">&quot;</span> -L -e <span class="st">&quot;</span><span class="ot">$login_url</span><span class="st">&quot;</span> -A <span class="st">&quot;</span><span class="ot">$UA</span><span class="st">&quot;</span> -o <span class="st">&quot;</span><span class="ot">$log_result</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="ot">$login_url</span><span class="st">&quot;</span>
+<span class="kw">}</span>
+
+<span class="fu">connect_internet()</span> <span class="kw">{</span>
+  <span class="co"># 连接互联网</span>
+  <span class="kw">curl</span> -k -e <span class="st">&quot;</span><span class="ot">$index_url</span><span class="st">&quot;</span> -b <span class="st">&quot;</span><span class="ot">$cookie_file</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="ot">$hb_url_0</span><span class="st">&quot;</span>
+<span class="kw">}</span>
+
+<span class="ot">connected=$(</span><span class="kw">isNetworkConnected</span><span class="ot">)</span>
+
+<span class="kw">if [</span> <span class="ot">$connected</span> <span class="ot">-eq</span> <span class="st">&quot;1&quot;</span><span class="kw"> ]</span>;<span class="kw">then</span>
+  <span class="kw">echo</span> <span class="st">&quot;we are connected!&quot;</span><span class="kw">;</span>
+  <span class="co"># 当前是已联网状态，保持心跳即可</span>
+  <span class="kw">keep_connected</span>
+<span class="kw">else</span>
+  <span class="co"># 当前是未联网状态</span>
+  <span class="kw">echo</span> <span class="st">&quot;we are disconnected&quot;</span><span class="kw">;</span>
+  <span class="kw">log_out</span>
+  <span class="kw">connect_lan</span>
+  <span class="kw">connect_internet</span>
+  <span class="kw">keep_connected</span>
+<span class="kw">fi</span></code></pre></div>
+<h1 id="中英文符号对照表">中英文符号对照表</h1>
+<hr />
+<ul>
+<li><strong>`</strong> backtick/backquote 反引号</li>
+<li><strong>[</strong> square bracket 方括号</li>
+<li><strong>'</strong> single quote 单引号</li>
+<li><strong>&quot;</strong> double quote 双引号</li>
+</ul>
+<hr />
+<ul>
+<li><strong>_</strong> underscore 下划线</li>
+<li><strong>/</strong> slash 斜线（URL、<strong>*NIX</strong> 路径分隔符）</li>
+<li><strong>\</strong> backslash 反斜线（转义符号、<strong>Windows</strong> 路径分隔符）</li>
+</ul>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 16进制表示的 ascii 码: 7c，英文术语：vertical bar，Shell编程里的“管道操作符”</span>
+<span class="kw">printf</span> <span class="st">&#39;%s&#39;</span> <span class="st">&#39;|&#39;</span> <span class="kw">|</span> <span class="kw">xxd</span>  
+
+<span class="co"># ref: https://www.zhihu.com/question/21747929/answer/319675621</span>
+<span class="kw">printf</span> <span class="st">&#39;%s&#39;</span> <span class="st">&#39;丨&#39;</span> <span class="kw">|</span> <span class="kw">xxd</span> <span class="co"># 16进制表示的 ascii 码: e4b8a8，汉语拼音：gun</span></code></pre></div>
+<hr />
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># ref: https://practicaltypography.com/hyphens-and-dashes.html</span>
+<span class="co"># 16进制表示的 ascii 码: 2d，英文术语：hyphen，中文术语：连字符，俗称：短杠</span>
+<span class="kw">printf</span> <span class="st">&#39;%s&#39;</span> <span class="st">&#39;-&#39;</span> <span class="kw">|</span> <span class="kw">xxd</span> 
+
+<span class="co"># 16进制表示的 ascii 码: e28093，英文术语：en dash</span>
+<span class="kw">printf</span> <span class="st">&#39;%s&#39;</span> <span class="st">&#39;–&#39;</span> <span class="kw">|</span> <span class="kw">xxd</span> 
+
+<span class="co"># 16进制表示的 ascii 码: e28094，这是中文输入法打出来的破折号的一半，英文术语：em dash</span>
+<span class="kw">printf</span> <span class="st">&#39;%s&#39;</span> <span class="st">&#39;—&#39;</span> <span class="kw">|</span> <span class="kw">xxd</span> </code></pre></div>
+<h1 id="推荐阅读">推荐阅读</h1>
+<hr />
+<p><a href="https://mywiki.wooledge.org/BashPitfalls">Bash Pitfalls</a></p>
+<blockquote>
+<p>参考C语言的一本经典著作《C Traps and Pitfalls》（中文译名《C 陷阱与缺陷》）的江湖地位和作用，堪为：入门后，进阶必读。</p>
+</blockquote>
+<hr />
+<p><a href="https://zhuanlan.zhihu.com/p/47819029">千万别混淆 Bash/Zsh 的四种运行模式</a></p>
+<blockquote>
+<p>Bash/Zsh 有四种不同运行模式，你的 bash 配置写错地方的话，不但会拖慢 bash 的速度，还会发生明明写了登录配置但是就是没生效的情况</p>
+</blockquote>
+<h1 id="推荐工具">推荐工具</h1>
+<hr />
+<p><a href="https://explainshell.com/"><img src="images/chap0x04/explainshell.png" alt="explainshell.com" /></a></p>
+<hr />
+<h2 id="bash-automated-testing-system"><a href="https://github.com/bats-core/bats-core">Bash Automated Testing System</a></h2>
+<p><a href="https://travis-ci.org/3c1rp4c/TravisBasedOJ"><img src="images/chap0x04/bats-core.png" alt="bats-core / bats-core" /></a></p>
+<blockquote>
+<p>Bats is a <a href="https://testanything.org/">TAP</a>-compliant testing framework for Bash. It provides a simple way to verify that the UNIX programs you write behave as expected.</p>
+</blockquote>
+<h1 id="参考文献">参考文献</h1>
+<hr />
+<ul>
+<li><a href="http://tldp.org/HOWTO/Bash-Prog-Intro-HOWTO.html">BASH Programming - Introduction HOW-TO</a></li>
+<li><a href="http://tldp.org/LDP/abs/html/">Advanced Bash-Scripting Guide</a></li>
+<li><a href="https://google.github.io/styleguide/shell.xml">Shell Style Guide by Google Inc.</a></li>
+<li><a href="https://www.gnu.org/software/bash/manual/html_node/index.html">Bash Reference Manual</a></li>
+<li><a href="http://www.bash.academy/">The Bash Academy</a></li>
+</ul>
+</body>
+</html>

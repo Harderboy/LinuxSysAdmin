@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="黄玮">
+  <title>Linux系统与网络管理</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header>
+<h1 class="title">Linux系统与网络管理</h1>
+<h2 class="author">黄玮</h2>
+</header>
+<h1 id="第三章linux服务器系统管理基础">第三章：Linux服务器系统管理基础</h1>
+<hr />
+<h2 id="system-administrator-is-root">System Administrator is root</h2>
+<h1 id="linux服务器管理员的典型工作场景和需求">Linux服务器管理员的典型工作场景和需求</h1>
+<hr />
+<ul>
+<li>本地工作用电脑是Windows或Mac，Linux是远程服务器系统</li>
+<li>服务器7x24小时开机，除去系统内核更新等需要重启服务器的情况</li>
+<li>远程SSH登录到服务器上是工作常态</li>
+<li>移动办公时可以保持远程服务器上的操作被“记住”和“按需复原”</li>
+<li>让进程更优雅的运行在后台，退出SSH会话不影响刚才启动的进程</li>
+</ul>
+<h1 id="远程管理工具箱">远程管理工具箱</h1>
+<hr />
+<ul>
+<li>工作电脑
+<ul>
+<li>SSH客户端软件</li>
+</ul></li>
+<li>服务器上
+<ul>
+<li>tmux（<a href="https://www.gnu.org/software/screen/">screen</a>的增强版）</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="tmux">tmux</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 开启一个tmux会话</span>
+<span class="kw">tmux</span>
+<span class="co"># CTRL-B d 脱离(detach)当前tmux会话</span>
+<span class="co"># 再开启一个tmux会话</span>
+<span class="kw">tmux</span>
+<span class="co"># CTRL-B d 再脱离(detach)当前tmux会话</span>
+<span class="co"># 查看当前可用的tmux会话列表</span>
+<span class="kw">tmux</span> ls
+<span class="co"># 连接到会话编号0的会话</span>
+<span class="kw">tmux</span> attach -t 0
+<span class="co"># 退出并关闭当前会话</span>
+<span class="kw">exit</span></code></pre></div>
+<hr />
+<p>用tmux重做上一章的ping前后台执行方式实验</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 本实验建议通过SSH远程登录到虚拟机上执行</span>
+<span class="kw">ping</span> www.baidu.com <span class="kw">2&gt;&amp;1</span> <span class="kw">1&gt;</span>/dev/null <span class="kw">&amp;</span>
+<span class="kw">ping</span> sec.cuc.edu.cn <span class="kw">2&gt;&amp;1</span> <span class="kw">1&gt;</span>/dev/null <span class="kw">&amp;</span>
+<span class="co"># 注意查看输出结果，观察ping进程的父进程是谁</span>
+<span class="kw">pstree</span> -A
+<span class="co"># 此时退出SSH登录</span>
+<span class="kw">exit</span>
+<span class="co"># 再重新SSH登录到虚拟机上执行</span>
+<span class="co"># 注意查看输出结果，观察ping进程的父进程是谁，和退出SSH登录之前相比是否有变化？</span>
+<span class="kw">pstree</span> -A
+<span class="co"># 开启一个tmux会话</span>
+<span class="kw">tmux</span>
+<span class="co"># 重复上述实验，用后台进程方式开启新的ping进程</span>
+<span class="co"># 再次SSH登录到虚拟机上执行</span>
+<span class="co"># 注意查看输出结果，观察ping进程的父进程是谁，和退出SSH登录之前相比是否有变化？</span>
+<span class="kw">pstree</span> -A</code></pre></div>
+<h1 id="用户组与权限管理">用户/组与权限管理</h1>
+<hr />
+<ul>
+<li>su与sudo
+<ul>
+<li>visudo</li>
+</ul></li>
+<li>passwd</li>
+<li>adduser/useradd</li>
+<li>groupadd/addgroup</li>
+<li>usermod</li>
+<li>getfacl/setfacl</li>
+</ul>
+<hr />
+<h2 id="用户标识uid">用户标识（uid）</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">id</span> --help
+<span class="kw">id</span>
+<span class="kw">id</span> -g
+<span class="kw">id</span> -u</code></pre></div>
+<ul>
+<li>上述后2个命令的参数作用是什么？</li>
+<li>什么是<strong>effective group ID</strong>？</li>
+<li>什么是<strong>effective user ID</strong>？</li>
+</ul>
+<hr />
+<h2 id="查看和理解文件和目录的属主与权限">查看和理解文件和目录的属主与权限</h2>
+<p>从🌰开始</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="kw">ls</span> -ld /tmp
+<span class="kw">drwxrwxrwt</span> 8 root root 4096 Jan 20 15:26 /tmp
+
+$ <span class="kw">ls</span> -l /usr/bin/passwd
+<span class="kw">-rwsr-xr-x</span> 1 root root 54256 Mar 29  2016 /usr/bin/passwd
+
+$ <span class="kw">ls</span> -l /etc/shadow
+<span class="kw">-rw-r-----</span> 1 root shadow 941 Jan 16 12:37 /etc/shadow</code></pre></div>
+<hr />
+<p>问题来了：</p>
+<ul>
+<li>rwx我们知道对应“读”、“写”、“执行”权限位标识，这里出现的<strong>d</strong>、<strong>t</strong>、<strong>s</strong>是什么情况？</li>
+<li>普通用户为什么可以使用<strong>/usr/bin/passwd</strong>去更改自己的密码（修改<strong>/etc/shadow</strong>文件）？</li>
+</ul>
+<hr />
+<p>文件类型</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">man</span> ls
+<span class="co"># 在ls的手册页内搜索file mode</span></code></pre></div>
+<ul>
+<li>b   块特殊文件（Block special file）</li>
+<li>c   字符特殊文件（Character special file）</li>
+<li>d   目录（Directory）</li>
+<li>l   符号链接（Symbolic link）</li>
+<li>s   套接字链接（Socket link）</li>
+<li>p   命名管道（FIFO）</li>
+<li>-   普通文件（Regular file）</li>
+</ul>
+<hr />
+<p>Saved UID (SUID)</p>
+<ul>
+<li>对应属主用户列权限位中的<strong>s</strong>标记，取代原有显示<strong>x</strong>标记的位置</li>
+<li>当且仅当一个文件是二进制可执行文件（脚本文件即使设置了“可执行”也不行）时可以被设置SUID</li>
+<li>一个被设置了SUID的程序，其他用户执行该程序时就会“暂时”得到文件拥有者（通常是root）的权限</li>
+</ul>
+<hr />
+<p>Saved GID (SGID)</p>
+<ul>
+<li>对应属主用户组列权限位中的<strong>s</strong>标记，取代原有显示<strong>x</strong>标记的位置</li>
+<li>如果SGID设置在二进制<strong>文件</strong>上，则不论用户是谁，在执行该程序的时候，它的有效用户组（effective group）将会变成该程序的用户组所有者（group id）</li>
+<li>如果SGID是设置在A<strong>目录</strong>上，则在该A<strong>目录</strong>内所建立的文件或目录的用户组，将强制被设置为此A目录的用户组</li>
+</ul>
+<hr />
+<p>Sticky Bit</p>
+<ul>
+<li>对应<strong>t</strong>标记，取代原有显示<strong>x</strong>标记的位置</li>
+<li>只能设置在目录上，对文件没有效果</li>
+<li>在被设置了<strong>t</strong>标记的目录下，用户若在该目录下具有w及x权限，则当用户在该目录下建立文件或目录时，只有文件属主与root才有权限删除</li>
+</ul>
+<hr />
+<h2 id="改变文件和目录的属主与权限">改变文件和目录的属主与权限</h2>
+<ul>
+<li>chown</li>
+<li>chgrp</li>
+<li>chmod</li>
+<li>umask</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 设置SUID</span>
+<span class="kw">chmod</span> 4755 filename
+
+<span class="co"># 设置SGID</span>
+<span class="kw">chmod</span> 2755 dirname
+
+<span class="co"># 同时设置SUID和SGID（罕见）</span>
+<span class="kw">chmod</span> 6755 filename
+
+<span class="co"># 设置Sticky Bit</span>
+<span class="kw">chmod</span> 1755 dirname</code></pre></div>
+<h1 id="sudo-的一些坑">sudo 的一些坑</h1>
+<hr />
+<h2 id="shell-内部命令无法-sudo">shell 内部命令无法 sudo</h2>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ot">cmds=(</span>echo cd history getopts kill pwd<span class="ot">)</span>; <span class="kw">for</span> <span class="kw">cmd</span> in <span class="st">&quot;</span><span class="ot">${cmds[@]}</span><span class="st">&quot;</span><span class="kw">;do</span> <span class="kw">type</span> -a <span class="st">&quot;</span><span class="ot">$cmd</span><span class="st">&quot;</span><span class="kw">;done</span>
+<span class="co"># echo is a shell builtin</span>
+<span class="co"># cd is a shell builtin</span>
+<span class="co"># history is a shell builtin</span>
+<span class="co"># getopts is a shell builtin</span>
+<span class="co"># kill is a shell builtin</span>
+<span class="co"># kill is /bin/kill</span>
+<span class="co"># pwd is a shell builtin</span>
+<span class="co"># pwd is /bin/pwd</span></code></pre></div>
+<hr />
+<h2 id="以下场景不要-sudo">以下场景不要 sudo</h2>
+<ul>
+<li>编辑用户家目录下的文件</li>
+<li>源代码编译</li>
+<li>针对 Mac 用户
+<ul>
+<li><del>
+sudo brew install
+</del></li>
+<li><del>
+sudo pip install
+</del></li>
+</ul></li>
+</ul>
+<h1 id="文件系统与存储管理">文件系统与存储管理</h1>
+<hr />
+<ul>
+<li>文件系统格式
+<ul>
+<li>ext3 / ext4 / swap</li>
+<li>mkfs</li>
+</ul></li>
+<li>文件分区
+<ul>
+<li>分区原则与策略</li>
+<li>fdisk</li>
+<li>大于2TB分区支持使用 <a href="https://www.cyberciti.biz/tips/fdisk-unable-to-create-partition-greater-2tb.html">parted</a></li>
+</ul></li>
+<li>文件系统挂载
+<ul>
+<li>U盘 / NFS / iso / 光盘</li>
+<li>/etc/fstab</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="逻辑卷管理---lvm-logical-volume-management"><a href="https://wiki.archlinux.org/index.php/LVM_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)">逻辑卷管理</a> - <a href="https://wiki.ubuntu.com/Lvm">LVM, Logical Volume Management</a></h2>
+<ul>
+<li>LVM 是一种可用在Linux内核的逻辑分卷管理器；可用于管理磁盘驱动器或其他类似的大容量存储设备</li>
+</ul>
+<p>LVM利用Linux内核的device-mapper来实现存储系统的虚拟化（系统分区独立于底层硬件）。 通过LVM，你可以实现存储空间的抽象化并在上面建立虚拟分区（virtual partitions），可以更简便地扩大和缩小分区，可以增删分区时无需担心某个硬盘上没有足够的连续空间，LVM是用来方便管理的，<strong>不会提供额外的安全保证</strong>。</p>
+<blockquote>
+<p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-pclvm-rstr/">配合存储硬件的Raid技术，提供高可靠性</a></p>
+</blockquote>
+<hr />
+<p>LVM的基本组成块（building blocks）如下：</p>
+<ul>
+<li>物理卷(PV, Physical Volume )：可以在上面建立卷组的媒介，可以是硬盘分区，也可以是硬盘本身或者回环文件（loopback file）。物理卷包括一个特殊的header，其余部分被切割为一块块物理区域（physical extents）。基于物理卷可以创建“逻辑上或虚拟的”硬盘。</li>
+<li>卷组(VG, Volume Group)：将一组物理卷收集为一个管理单元。一个卷组就相当于一个“物理”硬盘。</li>
+<li>逻辑卷(LV, Logical Volume)：虚拟分区，由物理区域（physical extents）组成。相当于基于“物理”硬盘（卷组）之上的文件系统分区。</li>
+<li>物理区域(PE, Physical Extent)：硬盘可供指派给逻辑卷的最小单位（通常为4MB）。</li>
+</ul>
+<hr />
+<p>优点(1/2)</p>
+<ul>
+<li>比起正常的硬盘分区管理，LVM更富于弹性：</li>
+<li>使用卷组，使众多硬盘空间看起来像一个大硬盘。</li>
+<li>使用逻辑卷，可以创建跨越众多硬盘空间的分区。</li>
+<li>可以创建小的逻辑卷，在空间不足时再动态调整它的大小。</li>
+<li>在调整逻辑卷大小时可以不用考虑逻辑卷在硬盘上的位置，不用担心没有可用的连续空间。</li>
+<li>可以在线对逻辑卷和卷组进行创建、删除、调整大小等操作。LVM上的文件系统也需要重新调整大小，某些文件系统也支持这样的在线操作。</li>
+</ul>
+<hr />
+<p>优点(2/2)</p>
+<ul>
+<li>无需重新启动服务，就可以将服务中用到的逻辑卷在线/动态迁移至别的硬盘上。</li>
+<li>允许创建快照，可以保存文件系统的备份，同时使服务的下线时间（downtime）降低到最小。</li>
+</ul>
+<p>这些优点使得LVM对服务器的管理非常有用，对于桌面系统管理的帮助则没有那么显著，你需要根据实际情况进行取舍。</p>
+<p>缺点</p>
+<ul>
+<li>在系统设置时需要更复杂的额外步骤。</li>
+</ul>
+<h1 id="文件备份---文件打包">文件备份 - 文件打包</h1>
+<hr />
+<ul>
+<li>大部分的Linux压缩工具遵循<strong><em><a href="http://sec.cuc.edu.cn/huangwei/wiki/teaching_basic_how_to_programming.html">KISS(Keep It Simple and Stupid)原则</a></em></strong>，即“<strong>每个程序只做一件事，不要试图在单个程序中完成多个任务</strong>”，所以压缩工具只是被设计用来对单个文件进行压缩，如果要对很多文件、一个目录下所有子目录和文件进行压缩，则需要先使用<strong>打包工具</strong>对批量的文件和目录进行打包，变成一个文件之后，再将压缩任务交给专门的压缩工具软件。</li>
+</ul>
+<h1 id="文件备份---文件归档">文件备份 - 文件归档</h1>
+<hr />
+<ul>
+<li>连同所有目录、文件的<strong>属主信息</strong>、<strong>时间戳信息</strong>一并<strong>打包</strong>保存</li>
+<li>妥善处理ln创建的链接文件（保留原有的目标指向信息），避免重复备份</li>
+<li><a href="https://help.ubuntu.com/community/BackupYourSystem/TAR">BackupYourSystem/TAR from ubuntu official documentation</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/full_system_backup_with_rsync">Full system backup with rsync</a>
+<ul>
+<li>增量备份</li>
+</ul></li>
+</ul>
+<h1 id="文件恢复">文件恢复</h1>
+<hr />
+<ul>
+<li>在<strong>系统正常时</strong>要<strong><em>定期测试备份文件是否可以正常恢复和还原</em></strong>
+<ul>
+<li><a href="https://about.gitlab.com/2017/02/01/gitlab-dot-com-database-incident/">2017年2月1日GitLab.com数据库被误删事件的官方通告</a></li>
+</ul></li>
+<li>恢复前记得先备份当前目标目录和文件，避免错误、不可逆的文件覆盖</li>
+<li>恢复前检查备份文件完整性（使用签名、散列值校验等）</li>
+</ul>
+<h1 id="系统备份">系统备份</h1>
+<hr />
+<p>备份策略设计约束性因素</p>
+<ul>
+<li>可移植性（便携性）：是否需要考虑跨OS的数据备份与恢复，如果是，则可以试试<strong>dd</strong>、<strong>tar</strong>、<strong>cpio</strong>等命令行工具</li>
+<li>无人值守（自动备份）</li>
+<li>用户友好：非专业用户首选交互设计良好的备份恢复工具</li>
+<li>远程备份：首选CLI方式的备份恢复工具</li>
+</ul>
+<hr />
+<ul>
+<li>网络备份：首选支持网络存储系统读写的备份恢复工具，如tar</li>
+<li>存储介质：成本、可靠性、存储容量和传输性能</li>
+<li>可审计：所有数据的备份方案，备份频率如何，备份数据放在哪里，保留多久等优先使用代码进行定义，而不是文档。备份策略的变更可以通过代码变更记录进行审计，对于违反备份策略、可能会引起备份或恢复失败的变更要能阻止变更（代码提交合并）</li>
+</ul>
+<hr />
+<h2 id="系统备份与恢复">系统备份与恢复</h2>
+<ul>
+<li>如果系统被评估为遭受了入侵，建议备份好重要数据之后，彻底重装系统</li>
+<li>基于文件备份和恢复机制</li>
+<li>使用专用的磁盘和文件系统级别的备份和恢复解决方案</li>
+</ul>
+<h1 id="开机自启动项管理">开机自启动项管理</h1>
+<hr />
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Init">SysVinit</a> | <a href="https://wiki.debian.org/LSBInitScripts">LSBInitScripts</a> | <a href="https://wiki.gentoo.org/wiki/OpenRC">OpenRC: Gentoo独有的系统服务启动控制机制</a>
+<ul>
+<li>/etc/init.d</li>
+</ul></li>
+<li><a href="http://upstart.ubuntu.com/">Upstart: Ubuntu（曾经）团队开发的系统服务启动控制机制</a>
+<ul>
+<li>/usr/share/upstart</li>
+</ul></li>
+<li><a href="https://www.freedesktop.org/wiki/Software/systemd/">Systemd</a>
+<ul>
+<li>/usr/lib/systemd</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="systemd---目前主流发行版支持情况">Systemd - 目前主流发行版支持情况</h2>
+<figure>
+<img src="images/chap0x03/systemd-adoption.png" />
+</figure>
+<hr />
+<h2 id="systemd---特性优点">Systemd - 特性（优点）</h2>
+<ul>
+<li>提供了积极的（服务、进程）并行化启动能力</li>
+<li>使用socket 和 D-Bus 机制来激活启动服务</li>
+<li>提供了按需启动守护进程能力</li>
+<li>实现了基于事务风格依赖管理的服务控制逻辑</li>
+<li>使用Linux的cgroup机制管理进程</li>
+<li>支持快照和还原</li>
+<li>维护挂载和自动挂载点</li>
+</ul>
+<hr />
+<h2 id="systemd---争议">Systemd - 争议</h2>
+<ul>
+<li>激进的设计
+<ul>
+<li>重新发明了一堆历史悠久的核心服务(syslog, ntp, cron, fstab, dhcpcd等等)，虽然是简化功能和配置，但有经验的系统管理员更信赖他们熟悉的服务（尽管配置较为复杂）</li>
+<li>作为系统的1号进程，承载的功能太多：单点故障风险集中、不符合UNIX设计哲学<strong><em><a href="http://sec.cuc.edu.cn/huangwei/wiki/teaching_basic_how_to_programming.html">KISS</a></em></strong></li>
+<li>不遵循 POSIX 标准，无法移植到Linux之外的平台</li>
+</ul></li>
+<li>过快的开发迭代
+<ul>
+<li>代码质量不高</li>
+<li>不考虑向后兼容</li>
+<li>频繁变更设计和接口</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="systemd---架构">Systemd - 架构</h2>
+<figure>
+<img src="images/chap0x03/Systemd_components.svg.png" />
+</figure>
+<h1 id="动手实战systemd">动手实战Systemd</h1>
+<hr />
+<ul>
+<li><a href="http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html">Systemd 入门教程：命令篇 by 阮一峰的网络日志</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-part-two.html">Systemd 入门教程：实战篇 by 阮一峰的网络日志</a>
+<ul>
+<li>参照第2章作业的要求，完整实验操作过程通过<a href="https://asciinema.org">asciinema</a>进行录像并上传，文档通过github上传</li>
+</ul></li>
+</ul>
+<h1 id="netplan"><a href="https://netplan.io/">NetPlan</a></h1>
+<hr />
+<h2 id="又一个网络配置管理工具">又一个「网络配置管理」工具</h2>
+<p>设计用于「替代」经典 Linux 网络管理工具 <a href="http://manpages.ubuntu.com/manpages/xenial/man5/interfaces.5.html">ifupdown</a></p>
+<figure>
+<img src="images/chap0x03/netplan_design_overview.png" />
+</figure>
+<hr />
+<h2 id="哪些发行版本在用">哪些发行版本在用</h2>
+<ul>
+<li><a href="https://blog.ubuntu.com/2017/07/10/netplan-by-default-in-17-10">Ubuntu 17.10</a> 开始在 Ubuntu 家族所有发行版中默认安装和启用</li>
+<li>目前其他发行版应用更广泛的还是经典的 <a href="http://manpages.ubuntu.com/manpages/xenial/man5/interfaces.5.html">ifupdown</a></li>
+</ul>
+<hr />
+<h2 id="快速上手">快速上手</h2>
+<ul>
+<li>配置文件路径 <code>/etc/netplan/*.yaml</code>
+<ul>
+<li><code>/run/netplan/*.yaml</code></li>
+<li><code>/lib/netplan/*.yaml</code></li>
+</ul></li>
+<li>测试和应用配置 <code>netplan apply</code>
+<ul>
+<li>验证 YAML 语法正确性 <code>yamllint</code></li>
+</ul></li>
+<li><a href="https://netplan.io/faq">FAQ</a></li>
+</ul>
+<hr />
+<h2 id="配置示例">配置示例</h2>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="co"># https://netplan.io/examples#using-dhcp-and-static-addressing</span>
+<span class="co"># https://netplan.io/reference</span>
+<span class="co"># https://github.com/CanonicalLtd/netplan/tree/master/examples</span>
+<span class="fu">network:</span>
+  <span class="fu">version:</span> 2
+<span class="co"># renderer: NetworkManager</span>
+  <span class="fu">renderer:</span> networkd
+  <span class="fu">ethernets:</span>
+    <span class="fu">enp3s0:</span>
+      <span class="fu">dhcp4:</span> true 
+    <span class="fu">enp5s0:</span>
+      <span class="fu">addresses:</span>
+        <span class="kw">-</span> 10.10.10.2/24
+      <span class="fu">match:</span>
+        <span class="fu">macaddress:</span> 56:2d:d1:8e:62:17
+      <span class="fu">gateway4:</span> 10.10.10.1
+      <span class="fu">nameservers:</span>
+          <span class="fu">search:</span> <span class="kw">[</span>mydomain<span class="kw">,</span> otherdomain<span class="kw">]</span>
+          <span class="fu">addresses:</span> <span class="kw">[</span>10.10.10.1<span class="kw">,</span> 1.1.1.1<span class="kw">]</span></code></pre></div>
+<hr />
+<h2 id="新的网卡命名风格">新的网卡命名风格</h2>
+<p><code>enp3s0</code></p>
+<ul>
+<li><code>en</code> 代表以太网卡</li>
+<li><code>p3s0</code> 代表 PCI 接口的物理位置为 <code>(3, 0)</code>, 其中横座标代表 <code>bus</code>，纵座标代表 <code>slot</code></li>
+</ul>
+<hr />
+<p>摘自 <a href="https://github.com/systemd/systemd/blob/master/src/udev/udev-builtin-net_id.c#L10">udev/udev-builtin-net_id.c</a></p>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="co">/* http://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames</span>
+<span class="co"> *</span>
+<span class="co"> * Two character prefixes based on the type of interface:</span>
+<span class="co"> *   en — Ethernet</span>
+<span class="co"> *   ib — InfiniBand</span>
+<span class="co"> *   sl — serial line IP (slip)</span>
+<span class="co"> *   wl — wlan</span>
+<span class="co"> *   ww — wwan</span>
+<span class="co"> *</span>
+<span class="co"> * Type of names:</span>
+<span class="co"> *   b&lt;number&gt;                             — BCMA bus core number</span>
+<span class="co"> *   c&lt;bus_id&gt;                             — bus id of a grouped CCW or CCW device,</span>
+<span class="co"> *                                           with all leading zeros stripped [s390]</span>
+<span class="co"> *   o&lt;index&gt;[n&lt;phys_port_name&gt;|d&lt;dev_port&gt;]</span>
+<span class="co"> *                                         — on-board device index number</span>
+<span class="co"> *   s&lt;slot&gt;[f&lt;function&gt;][n&lt;phys_port_name&gt;|d&lt;dev_port&gt;]</span>
+<span class="co"> *                                         — hotplug slot index number</span>
+<span class="co"> *   x&lt;MAC&gt;                                — MAC address</span>
+<span class="co"> *   [P&lt;domain&gt;]p&lt;bus&gt;s&lt;slot&gt;[f&lt;function&gt;][n&lt;phys_port_name&gt;|d&lt;dev_port&gt;]</span>
+<span class="co"> *                                         — PCI geographical location</span>
+<span class="co"> *   [P&lt;domain&gt;]p&lt;bus&gt;s&lt;slot&gt;[f&lt;function&gt;][u&lt;port&gt;][..][c&lt;config&gt;][i&lt;interface&gt;]</span>
+<span class="co"> *                                         — USB port number chain</span>
+<span class="co"> *   v&lt;slot&gt;                               - VIO slot number (IBM PowerVM)</span>
+<span class="co"> *   a&lt;vendor&gt;&lt;model&gt;i&lt;instance&gt;           — Platform bus ACPI instance id</span>
+<span class="co"> */</span></code></pre></div>
+<h1 id="其他过时的知名网络管理工具">其他过时的知名网络管理工具</h1>
+<hr />
+<p><a href="https://wiki.linuxfoundation.org/networking/net-tools">net-tools</a> 已过时，<a href="https://wiki.linuxfoundation.org/networking/iproute2">iproute2</a> 是现在。</p>
+<blockquote>
+<p>Most network configuration manuals still refer to ifconfig and route as the primary network configuration tools, but ifconfig is known to behave inadequately in modern network environments. <strong>They should be deprecated</strong>, but most distros still include them.</p>
+</blockquote>
+<hr />
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><a href="http://net-tools.sourceforge.net/">过时命令 net-tools</a></th>
+<th style="text-align: center;"><a href="https://dougvitale.wordpress.com/2011/12/21/deprecated-linux-networking-commands-and-their-replacements/">替代命令 iproute2</a></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">arp</td>
+<td style="text-align: center;">ip n (ip neighbor)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">ifconfig</td>
+<td style="text-align: center;">ip a (ip addr), ip link, ip -s (ip -stats)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">iwconfig</td>
+<td style="text-align: center;">iw</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">nameif</td>
+<td style="text-align: center;">ip link, ifrename</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">netstat</td>
+<td style="text-align: center;">ss</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">netstat -i</td>
+<td style="text-align: center;">ip -s link</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">netstat -r</td>
+<td style="text-align: center;">ip route</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">netstat -g</td>
+<td style="text-align: center;">ip maddr</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">route</td>
+<td style="text-align: center;">ip r (ip route)</td>
+</tr>
+</tbody>
+</table>
+<h1 id="本章完成后的自查清单">本章完成后的自查清单</h1>
+<hr />
+<ul>
+<li>如何添加一个用户并使其具备sudo执行程序的权限？</li>
+<li>如何将一个用户添加到一个用户组？</li>
+<li>如何查看当前系统的分区表和文件系统详细信息？</li>
+<li>如何实现开机自动挂载Virtualbox的共享目录分区？</li>
+<li>基于LVM（逻辑分卷管理）的分区如何实现动态扩容和缩减容量？</li>
+<li>如何通过systemd设置实现在网络连通时运行一个指定脚本，在网络断开时运行另一个脚本？</li>
+<li>如何通过systemd设置实现一个脚本在任何情况下被杀死之后会立即重新启动？实现<strong><em>杀不死</em></strong>？</li>
+</ul>
+<h1 id="参考文献">参考文献</h1>
+<hr />
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/User_identifier">User identifier from WikiPedia</a></li>
+<li><a href="http://people.canonical.com/~cjwatson/ubuntu-policy/policy.html/ch-opersys.html">Ubuntu Policy Manual Chapter 9 - The Operating System</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/umask">umask</a></li>
+<li><a href="https://www.zhihu.com/question/55300424">如何评价 2017 年 2 月 1 日 GitLab 数据库被误删？ from 知乎</a></li>
+</ul>
+<hr />
+<ul>
+<li><a href="http://forensicswiki.org/wiki/Tools">Forensics Tools on Linux</a></li>
+<li><a href="http://harttle.com/2015/11/06/tmux-startup.html">优雅地使用命令行：Tmux 终端复用</a></li>
+<li><a href="http://cenalulu.github.io/linux/tmux/">Tmux - Linux从业者必备利器</a></li>
+<li><a href="http://www.tldp.org/LDP/lame/LAME/linux-admin-made-easy/server-backup.html">Linux Administration Made Easy Chapter 8. Backup and Restore Procedures</a></li>
+<li><a href="https://help.ubuntu.com/community/BackupYourSystem">BackupYourSystem from ubuntu official documentation</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html">Systemd 入门教程：命令篇 by 阮一峰的网络日志</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-part-two.html">Systemd 入门教程：实战篇 by 阮一峰的网络日志</a></li>
+</ul>
+<hr />
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Systemd">systemd on wikipedia</a></li>
+<li><a href="https://fedoraproject.org/wiki/Systemd/zh-cn">Fedora官网Wiki对Systemd的介绍</a></li>
+<li><a href="https://wiki.archlinux.org/index.php/systemd_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)">ArchiLinux官网Wiki对Systemd的介绍</a></li>
+<li><a href="https://wiki.debian.org/systemd">Debian官网Wiki对Systemd的介绍</a></li>
+<li><a href="https://wiki.ubuntu.com/SystemdForUpstartUsers">Ubuntu官网Wiki对Systemd的介绍</a></li>
+<li><a href="https://www.zhihu.com/question/25873473">systemd 为什么会有那么大的争议？</a></li>
+<li><a href="https://wiki.debian.org/Debate/initsystem/">Debian官方对目前主流系统引导机制的优缺点分析讨论</a></li>
+<li><a href="https://www.freedesktop.org/software/systemd/man/bootup.html">系统启动过程</a></li>
+</ul>
+</body>
+</html>

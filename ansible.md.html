@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="黄玮">
+  <title>Linux系统与网络管理</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css">
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/white.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+  <h1 class="title">Linux系统与网络管理</h1>
+  <h2 class="author">黄玮</h2>
+</section>
+
+<section><section id="番外ansible" class="titleslide slide level1"><h1>番外：Ansible</h1></section><section class="slide level2">
+
+<p>最权威，没有之一：<a href="http://docs.ansible.com/ansible/latest/index.html">Ansible Core - Official Documentation</a></p>
+<p>最权威，没有之一：<a href="http://docs.ansible.com/ansible/latest/index.html">Ansible Core - Official Documentation</a></p>
+<p>最权威，没有之一：<a href="http://docs.ansible.com/ansible/latest/index.html">Ansible Core - Official Documentation</a></p>
+</section><section id="提纲" class="slide level2">
+<h1>提纲</h1>
+<ul>
+<li>安装</li>
+<li>核心术语</li>
+<li>项目结构</li>
+</ul>
+</section></section>
+<section><section id="版本说明" class="titleslide slide level1"><h1>版本说明</h1></section><section class="slide level2">
+
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">ansible</span> --version
+<span class="kw">ansible</span> 2.4.0.0
+  <span class="kw">config</span> file = None
+  <span class="kw">configured</span> module search path = [u<span class="st">&#39;$HOME/.ansible/plugins/modules&#39;</span>, u<span class="st">&#39;/usr/share/ansible/plugins/modules&#39;</span>]
+  <span class="kw">ansible</span> python module location = <span class="ot">$ANSIBLE_ROOT</span>/libexec/lib/python2.7/site-packages/ansible
+  <span class="kw">executable</span> location = /usr/local/bin/ansible
+  <span class="kw">python</span> version = 2.7.14 (default, Feb  3 2018, 15:37:41) [<span class="kw">GCC</span> 4.2.1 Compatible Apple LLVM 9.0.0 (clang-900.0.39.2)]</code></pre></div>
+</section></section>
+<section><section id="installation" class="titleslide slide level1"><h1><a href="http://docs.ansible.com/ansible/latest/intro_installation.html">安装</a></h1></section><section class="slide level2">
+
+<p>Ansible 官方推荐 <code>Red Hat Enterprise Linux (TM)</code>, <code>CentOS</code>, <code>Fedora</code>, <code>Debian</code>, <code>Ubuntu</code> 操作系统用户直接使用操作系统官方维护和打包的最新版软件包。除此之外，也可以通过 Python 的包管理器 <code>pip</code> 进行安装。</p>
+</section></section>
+<section><section id="核心术语" class="titleslide slide level1"><h1>核心术语</h1></section><section class="slide level2">
+
+<ul>
+<li><a href="http://docs.ansible.com/ansible/latest/intro_inventory.html">Inventory</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/intro_adhoc.html">Ad-Hoc Commands</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/playbooks.html">Playbooks</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/modules.html">Modules</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/vault.html">Ansible Vault</a></li>
+</ul>
+</section><section id="inventory" class="slide level2">
+<h1><a href="http://docs.ansible.com/ansible/latest/intro_inventory.html">Inventory</a></h1>
+<ul>
+<li>默认全局 <code>清单</code> 文件：<code>/etc/ansible/hosts</code></li>
+<li><strong>最常用</strong>的 <code>清单</code> 文件：<code>-i &lt;path&gt;</code> ，通过命令行参数自行指定 <code>清单</code> 文件路径</li>
+<li><a href="https://github.com/c4pr1c3/AnsibleTutorial">实例</a></li>
+</ul>
+</section><section id="ad-hoc-commands" class="slide level2">
+<h1><a href="http://docs.ansible.com/ansible/latest/intro_adhoc.html">Ad-Hoc Commands</a></h1>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># 使用 ansible 内置的 ping 模块</span>
+<span class="co">## 在 清单 文件中名为 ubuntu 的主机或主机组定义的所有主机 上执行</span>
+<span class="kw">ansible</span> ubuntu -i hosts -m ping
+<span class="co">## 在 清单 文件中定义的所有 不重复主机 上执行</span>
+<span class="kw">ansible</span> all -i hosts -m ping
+
+<span class="co"># 执行远程主机上的指令</span>
+<span class="kw">ansible</span> all -i hosts -a <span class="st">&#39;ip addr&#39;</span></code></pre></div>
+</section></section>
+<section><section id="playbooks" class="titleslide slide level1"><h1><a href="http://docs.ansible.com/ansible/latest/playbooks.html">Playbooks</a></h1></section><section class="slide level2">
+
+<blockquote>
+<p>Playbooks 是 Ansible 的 配置、部署和编排语言，可以用于定义远程主机强制执行策略或一般性 IT 过程。</p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/ansible/ansible-examples">Ansible 官方提供的一些示例 Playbooks</a></li>
+<li>核心语言使用的 <a href="http://docs.ansible.com/ansible/latest/YAMLSyntax.html">YAML</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/playbooks_keywords.html">Ansible 官方提供的指令速查词典</a></li>
+</ul>
+</section><section id="yaml-quick-start" class="slide level2">
+<h1>YAML Quick Start</h1>
+<ul>
+<li>（可选）<code>---</code> 定义 YAML 文件开始，<code>...</code> 定义 YAML 文件结束</li>
+<li><code>list</code> 数据结构，使用 <code>-</code> （一个短杠和一个空格）</li>
+<li><code>dict</code> 数据结构，使用 <code>key: value</code> 形式</li>
+<li>续行符
+<ul>
+<li><code>|</code> 包含换行符</li>
+<li><code>&gt;</code> 忽略换行符</li>
+</ul></li>
+<li>尽可能多的使用 <strong>双引号</strong> 包围变量的赋值</li>
+</ul>
+</section><section id="yaml-basic-examples" class="slide level2">
+<h1>YAML Basic Examples</h1>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="co"># Employee records</span>
+<span class="kw">-</span>  <span class="fu">martin:</span>
+    <span class="fu">name:</span> Martin D&#39;vloper
+    <span class="fu">job:</span> Developer
+    <span class="fu">skills:</span>
+      <span class="kw">-</span> python
+      <span class="kw">-</span> perl
+      <span class="kw">-</span> pascal
+<span class="kw">-</span>  <span class="fu">tabitha:</span>
+    <span class="fu">name:</span> Tabitha Bitumen
+    <span class="fu">job:</span> Developer
+    <span class="fu">skills:</span>
+      <span class="kw">-</span> lisp
+      <span class="kw">-</span> fortran
+      <span class="kw">-</span> erlang
+
+<span class="co"># 上述例子的等价单行写法如下：</span>
+<span class="ot">---</span>
+<span class="fu">martin:</span> <span class="kw">{</span><span class="fu">name:</span> Martin D&#39;vloper<span class="kw">,</span> <span class="fu">job:</span> Developer<span class="kw">,</span> <span class="fu">skill:</span> Elite<span class="kw">}</span>
+<span class="fu">fruits:</span> <span class="kw">[</span><span class="st">&#39;Apple&#39;</span><span class="kw">,</span> <span class="st">&#39;Orange&#39;</span><span class="kw">,</span> <span class="st">&#39;Strawberry&#39;</span><span class="kw">,</span> <span class="st">&#39;Mango&#39;</span><span class="kw">]</span></code></pre></div>
+</section><section id="yaml-multiple-lines-span-examples" class="slide level2">
+<h1>YAML Multiple Lines Span Examples</h1>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">include_newlines:</span> |
+            exactly as you see
+            will appear these three
+            lines of poetry
+
+<span class="fu">ignore_newlines:</span> &gt;
+            this is really a
+            single line of text
+            despite appearances</code></pre></div>
+</section></section>
+<section><section id="variables" class="titleslide slide level1"><h1>变量</h1></section><section class="slide level2">
+
+<p>变量作用域优先级如下，自顶向下优先级依次升高：</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">role</span> defaults 
+<span class="kw">inventory</span> file or script group vars
+<span class="kw">inventory</span> group_vars/all
+<span class="kw">playbook</span> group_vars/all
+<span class="kw">inventory</span> group_vars/*
+<span class="kw">playbook</span> group_vars/*
+<span class="kw">inventory</span> file or script host vars
+<span class="kw">inventory</span> host_vars/*
+<span class="kw">playbook</span> host_vars/*
+<span class="kw">host</span> facts
+<span class="kw">play</span> vars
+<span class="kw">play</span> vars_prompt
+<span class="kw">play</span> vars_files
+<span class="kw">role</span> vars (defined in role/vars/main.yml)
+<span class="kw">block</span> vars (only for tasks in block)
+<span class="kw">task</span> vars (only for the task)
+<span class="kw">role</span> (and include_role) <span class="kw">params</span>
+<span class="kw">include</span> params
+<span class="kw">include_vars</span>
+<span class="kw">set_facts</span> / registered vars
+<span class="kw">extra</span> vars (always win precedence)</code></pre></div>
+</section></section>
+<section><section id="modules" class="titleslide slide level1"><h1><a href="http://docs.ansible.com/ansible/latest/modules.html">Modules</a></h1></section><section class="slide level2">
+
+<p>常见运维任务都可以找到 <code>ansible</code> 内置模块的支持，例如：</p>
+<ul>
+<li><a href="http://docs.ansible.com/ansible/latest/list_of_files_modules.html">文件上传、权限设置、查找、元信息获取、基于模版生成配置文件等</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/list_of_packaging_modules.html">bower、composer、pip、pear等主流编程语言的包管理工具，apt、homebrew、yum等操作系统包管理工具</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/list_of_system_modules.html">操作系统级别管理工具：用户/用户组管理、systemd服务管理、时区管理、内核加载模块管理等</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/list_of_commands_modules.html">远程命令执行、脚本执行等</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/list_of_crypto_modules.html">PKI 证书管理</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/list_of_database_modules.html">常见数据库管理</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/list_of_web_infrastructure_modules.html">常见Web基础设施管理：supervisorctl、htpasswd、apache2_module、letsencrypt等</a></li>
+<li><a href="http://docs.ansible.com/ansible/latest/list_of_source_control_modules.html">常见版本控制工具管理</a></li>
+</ul>
+</section></section>
+<section><section id="ansible-vault" class="titleslide slide level1"><h1><a href="http://docs.ansible.com/ansible/latest/vault.html">Ansible Vault</a></h1></section><section id="what-can-be-encrypted-with-vault" class="slide level2">
+<h1><a href="http://docs.ansible.com/ansible/latest/vault.html#what-can-be-encrypted-with-vault">What Can Be Encrypted With Vault</a></h1>
+<p>可以对以下路径下的文件加密</p>
+<ul>
+<li><code>group_vars/</code></li>
+<li><code>host_vars/</code></li>
+</ul>
+<p>也可以对 Ansible 变量加密</p>
+</section><section class="slide level2">
+
+<ul>
+<li><strong>建议-1</strong> 仅对需要加密的变量进行加密，避免加密扩大化；</li>
+<li><strong>建议-2</strong> 为了便于 <code>grep</code> 等文本检索工具检索所有被引用的变量定义，对于需要加密的变量建议使用一个 <strong>中间变量</strong> 来隔离 <code>被引用变量</code> 和 <code>加密数据</code>。</li>
+</ul>
+</section><section class="slide level2">
+
+<p>变量加密推荐做法实例</p>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="co"># group_vars/demo/vars.html</span>
+<span class="fu">demo_group_name:</span> <span class="st">&quot;demo&quot;</span>
+<span class="fu">demo_users:</span> 
+  <span class="fu">alice:</span>
+    <span class="fu">group:</span> <span class="st">&quot;vault_group&quot;</span>
+    <span class="fu">passwd:</span> <span class="st">&quot;{{ vault_demo_users.alice.passwd }}&quot;</span>
+  <span class="fu">bob:</span>
+    <span class="fu">group:</span> <span class="st">&quot;vault_group&quot;</span>
+    <span class="fu">passwd:</span> <span class="st">&quot;{{ vault_demo_users.bob.passwd }}&quot;</span>
+
+<span class="co"># group_vars/demo/vault.html</span>
+<span class="co"># 该文件的实际内容使用 ansible-vault 加密存储</span>
+<span class="fu">vault_demo_users:</span>
+  <span class="fu">alice:</span>
+    <span class="fu">passwd:</span> <span class="st">&quot;plz-change-me&quot;</span>
+  <span class="fu">bob:</span>
+    <span class="fu">passwd:</span> <span class="st">&quot;plz-change-me&quot;</span></code></pre></div>
+</section></section>
+<section><section id="项目结构" class="titleslide slide level1"><h1>项目结构</h1></section><section class="slide level2">
+
+<p><a href="http://docs.ansible.com/ansible/latest/playbooks_best_practices.html">Ansible Best Practices</a></p>
+<p>在官方推荐的 <a href="http://docs.ansible.com/ansible/latest/playbooks_best_practices.html#directory-layout">Directory Layout</a> 基础之上，进一步精简一个常用目录组织结构：</p>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml">production                <span class="co"># 生产环境服务器清单文件</span>
+staging                   <span class="co"># 模拟环境服务器清单文件</span>
+
+group_vars/
+   group1                 <span class="co"># here we assign variables to particular groups</span>
+   group2                 <span class="co"># &quot;&quot;</span>
+host_vars/
+   hostname1              <span class="co"># if systems need specific variables, put them here</span>
+   hostname2              <span class="co"># &quot;&quot;</span>
+
+site.yml                  <span class="co"># master playbook</span>
+webservers.yml            <span class="co"># playbook for webserver tier</span>
+dbservers.yml             <span class="co"># playbook for dbserver tier</span>
+
+roles/
+    common/               <span class="co"># this hierarchy represents a &quot;role&quot;</span>
+        tasks/            <span class="co">#</span>
+            main.yml      <span class="co">#  &lt;-- tasks file can include smaller files if warranted</span>
+        handlers/         <span class="co">#</span>
+            main.yml      <span class="co">#  &lt;-- handlers file</span>
+        templates/        <span class="co">#  &lt;-- files for use with the template resource</span>
+            ntp.conf.j2   <span class="co">#  &lt;------- templates end in .j2</span>
+        files/            <span class="co">#</span>
+            bar.txt       <span class="co">#  &lt;-- files for use with the copy resource</span>
+            foo.sh        <span class="co">#  &lt;-- script files for use with the script resource</span>
+        vars/             <span class="co">#</span>
+            main.yml      <span class="co">#  &lt;-- variables associated with this role</span>
+        defaults/         <span class="co">#</span>
+            main.yml      <span class="co">#  &lt;-- default lower priority variables for this role</span>
+        meta/             <span class="co">#</span>
+            main.yml      <span class="co">#  &lt;-- role dependencies</span>
+
+    webtier/              <span class="co"># same kind of structure as &quot;common&quot; was above, done for the webtier role</span>
+    monitoring/           <span class="co"># &quot;&quot;</span>
+    fooapp/               <span class="co"># &quot;&quot;</span></code></pre></div>
+</section></section>
+<section><section id="参考资料" class="titleslide slide level1"><h1>参考资料</h1></section><section class="slide level2">
+
+<ul>
+<li><a href="http://cheat.readthedocs.io/en/latest/ansible/">Cheatsheet of Ansible</a></li>
+<li><a href="https://gist.github.com/andreicristianpetcu/b892338de279af9dac067891579cad7d">An Ansible summary Jon Warbrick, July 2014, V3.2 (for Ansible 1.7)</a></li>
+</ul>
+</section></section>
+    </div>
+  </div>
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // Transition style
+        transition: 'fade', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>
